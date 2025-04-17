@@ -1,7 +1,9 @@
 /*---------------------------------------------------------*/
-*! Example Code for combining Matching with Eventstudy design
-*! Author: Johannes F. Schmieder
+* Example Code for combining Matching with Eventstudy design
+* Author: Johannes F. Schmieder
 * do matching_eventstudy_example.do
+* This version: April 17, 2025
+* Version 1.0
 /*---------------------------------------------------------*/
 set more off
 program drop _all
@@ -35,15 +37,15 @@ program define main
 	// =====================================
 	// Simulate Yearly Data
 	// =====================================
-	// simulate_yearly_data, out(${data}person_year_data.dta)
+	simulate_yearly_data, out(${data}person_year_data.dta)
 
 	// =====================================
-	// Generate Analysis File
+	// Matching Algorithm to create treatment and control group
 	// =====================================
 
-	// generate_treatment_control, ///
-	// 	in(${data}person_year_data.dta) ///
-	// 	out(${data}analysis_data.dta)
+	generate_treatment_control, ///
+		in(${data}person_year_data.dta) ///
+		out(${data}analysis_data.dta)
 
 	// =====================================
 	// Descriptive Analysis
@@ -74,7 +76,7 @@ program define simulate_yearly_data
 		startyear(int 1990) ///
 		endyear(int 2005) ///
 		number_firms(int 100) ///
-		number_workers(int 10000) ///
+		number_workers(int 20000) ///
 		]
 
 	// Generate firm data - assume firms are constant over time
@@ -184,8 +186,12 @@ program define simulate_yearly_data
 
 	// Simulate Wage Process
 	g logearn = 8.0 + 0.02*(year-2000) + (0.001*(year-1993))^2 ///
+		- 0.05 * (year==1993) ///
+		- 0.05 * (year==2003) ///
 		- female*0.2  ///
-		+ edyrs * 0.1 + (age-edyrs) * 0.01 ///
+		+ edyrs * 0.1  ///
+		+ (age-edyrs) * 0.0005 ///
+		- (age-edyrs)^2 * 0.0001 ///
 		+ rnormal()*0.02*(year-1995) ///
 			+ rnormal()*0.03 ///
 		- 0.2 * displaced
@@ -223,6 +229,16 @@ program define simulate_yearly_data
 	label define sep1 1 "Displaced worker" 2 "Non-displaced worker"
 	label values sep sep1
 
+
+
+	bys persid (time): g leave_labor_force = runiform()<.03 
+	bys persid (time): replace leave_labor_force = leave_labor_force[_n-1] if _n>1 & leave_labor_force==0
+	replace employed = 0 if leave_labor_force==1
+	replace earn = 0 if leave_labor_force==1
+	replace logearn = . if leave_labor_force==1
+	replace displaced = 0 if leave_labor_force==1
+	
+	
 	tsset persid time
 	g disp_event = displaced==1 & l.displaced==0
 
@@ -233,13 +249,9 @@ program define simulate_yearly_data
 	bys persid (baselinetime) : replace baselinetime = baselinetime[1]
 	g timesince = time-baselinetime-1
 
-	// cellgraph logearn if inrange(timesince,-5,10), by(timesince)
+	// cellgraph logearn  if inrange(timesince,-5,10), by(timesince)
+	// cellgraph employed if inrange(timesince,-5,10), by(timesince)
 
-	// 	cellgraph employed if inrange(timesince,-5,10), by(timesince)
-	// 	cellgraph earn     if inrange(timesince,-5,10), by(timesince)
-	cellgraph logearn  if inrange(timesince,-5,10), by(timesince)
-
-	// 	xtreg logearn displaced time, fe i(persid)
 
 	rename timesince timesince1
 	rename displaced displaced1
@@ -270,7 +282,7 @@ program define generate_treatment_control
 
 	local matchround 1 // counter for psmatch round, used to create unique match ID
 
-	local cell_vars industry female  // cells within we match treatment and control
+	local cell_vars industry female  // cells within we match treatment and control, we also always match within baseline year / time
 	// Add county, use more detailed industry
 
 	// Code for using quarter time units
@@ -479,41 +491,34 @@ program define descriptive_analysis
 	latexlog `file': title "Descriptives for Displacement Analysis Sample"
 
 	latexlog `file': section "Summary Table"
-
-	// ====== Handcoded Summary Table ======
-	preserve
-	keep if  timesince==-1
-	summary_table , panels(1 2 3) out(`file') title(Sample Characteristics at Baseline (Quarter before Disp t=-1))
-	restore
-
 	
 	// ====== Summary Tables using Stata's Table Command ======
 	
-	local vars byear age female edyrs earn logearn  employed firmsize firmeff
+	local vars byear age female edyrs earn logearn  employed firmsize // firmeff
 	g N = 1
 	label var N "Number of Observations"
 	// ====== Summary Table ======
 	// Create summary table using Stata's table command
 	
-	// 	table (var) (sep) if timesince==-1, ///
-	// 		statistic(mean `vars') ///
-	// 		statistic(sd `vars') ///
-	// 		statistic(count N) ///
-	// 		nformat(%9.2f) nototals 
-	//	
-	// 	collect style header result, level(hide)
-	// 	collect style cell result[sd], sformat("[%s]")
-	// 	collect style cell result[count], nformat("%8.0gc")
-	// 	collect style cell result, halign(center)
-	// 	collect style cell var[N], border(top)
-	//
-	// 	collect label levels sep 0 "Non-displaced" 1 "Displaced", modify
-	// 	collect style header sep, title(hide)
-	// 	// collect style header sep, level(hide)
-	// 	collect preview
-	// 	latexlog `file': collect export , ///
-	// 		booktabs novert three  ///
-	// 		title(Summary Statistics by Displacement Status) 
+		// table (var) (sep) if timesince==-1, ///
+		// 	statistic(mean `vars') ///
+		// 	statistic(sd `vars') ///
+		// 	statistic(count N) ///
+		// 	nformat(%9.2f) nototals 
+		
+		// collect style header result, level(hide)
+		// collect style cell result[sd], sformat("[%s]")
+		// collect style cell result[count], nformat("%8.0gc")
+		// collect style cell result, halign(center)
+		// collect style cell var[N], border(top)
+	
+		// collect label levels sep 0 "Non-displaced" 1 "Displaced", modify
+		// collect style header sep, title(hide)
+		// // collect style header sep, level(hide)
+		// collect preview
+		// latexlog `file': collect export , ///
+		// 	booktabs novert three  ///
+		// 	title(Summary Statistics by Displacement Status) 
 		
 	// ======  Summary Table with overlapping columns ======
 	
@@ -643,9 +648,7 @@ program define descriptive_analysis
 	
 	latexlog `file': section "Consistency Checks"
 	cap mkdir ${log}Consistency/
-	
-
-	
+		
 	cellgraph N , by(time) nonotes stat(sum)
 	latexlog `file': addfig, file(Consistency/counts_by_time.pdf) eol
 	
@@ -665,7 +668,6 @@ program define descriptive_analysis
 	latexlog `file': addfig, file(Consistency/displaced_by_time.pdf) eol
 
 
-
 	latexlog `file': section "Treatment and Control around Displacement Event"
 	cap mkdir ${log}Disp_event_raw/
 
@@ -675,14 +677,14 @@ program define descriptive_analysis
 	cellgraph earn , by(timesince sep) nonotes
 	latexlog `file': addfig, file(Disp_event_raw/logearn_by_timesince.pdf) eol
 
-	// cellgraph logearn , by(timesince sep) nonotes
-	// latexlog `file': addfig, file(Disp_event_raw/earn_by_timesince.pdf) eol
+	cellgraph logearn , by(timesince sep) nonotes
+	latexlog `file': addfig, file(Disp_event_raw/earn_by_timesince.pdf) eol
 
-	// cellgraph employed , by(timesince sep) nonotes
-	// latexlog `file': addfig, file(Disp_event_raw/employed_by_timesince.pdf) eol
+	cellgraph employed , by(timesince sep) nonotes
+	latexlog `file': addfig, file(Disp_event_raw/employed_by_timesince.pdf) eol
 
-	// cellgraph displaced , by(timesince sep) nonotes
-	// latexlog `file': addfig, file(Disp_event_raw/displaced_by_timesince.pdf) eol
+	cellgraph displaced , by(timesince sep) nonotes
+	latexlog `file': addfig, file(Disp_event_raw/displaced_by_timesince.pdf) eol
 
 
 	latexlog `file': close
@@ -690,121 +692,6 @@ program define descriptive_analysis
 
 end // descriptive_analysis
 
-/*-------------------------------------------------------*/
-/* Table - Average Characteristics in Analysis Data   */
-/*-------------------------------------------------------*/
-cap program drop summary_table
-program define summary_table
-
-	syntax , [OUTputfile(str) panels(str) title(str)]
-
-	local file `outputfile'
-	if `"`title'"'==`""' local title Summary Table
-
-	// ===== Set Parameters =====
-
-	local pan1 Panel A: Demographics
-	local pan2 Panel B: Earnings Variables
-	local pan3 Panel C: Firm Characteristics
-
-	local vars1 byear age female edyrs
-
-	local vars2 earn logearn employed
-
-	local vars3 firmsize firmeff
-
-
-	local conditions ///
-		1 ///
-		sep==1  ///
-		sep==0
-
-	local wi1 %-55s // width of first column
-	local wi2 %20s  // width of second column
-	local T  : di `wi1' " "
-	local cols 1
-	foreach c in `conditions' {
-		local cols = `cols'+1
-	}
-
-	// local size \footnotesize
-
-	// ===== Build Table =====
-
-	writeln `file' "\begin{table}[p] \centering "
-	writeln `file' "\begin{threeparttable} "
-	writeln `file' "\caption{`title'}   `size' "
-	// writeln `file' "\fontsize{9}{9}\selectfont"
-	writeln `file' "\begin{tabular}{l *{`=`cols'-1'}{c}} "
-	writeln `file' "\toprule"
-
-	local t1 : di "`T'" " &" `wi2' "(1)                " " &" `wi2' "(2)             " " &" `wi2' "(3)             " //  " &" `wi2' "  (4)           "  //  " &" `wi2' "  (5)       "  " &" `wi2' "  (6)       "
-	local t2 : di "`T'" " &" `wi2' "Full Sample        " " &" `wi2' "Displaced       " " &" `wi2' "Non-Displaced   " //  " &" `wi2' "Year            "    //  " &" `wi2' "As Column (3) "
-	local t3 : di "`T'" " &" `wi2' "                   " " &" `wi2' "Workers         " " &" `wi2' "Workers         " //  " &" `wi2' "2017            "    //	" &" `wi2' "but only Age  "
-	local t4 : di "`T'" " &" `wi2' "                   " " &" `wi2' "                " " &" `wi2' "                " //  " &" `wi2' "                "    //	" &" `wi2' "42 to 43      "
-
-	writeln `file' "`t1' \\"
-	writeln `file' "`t2' \\"
-	writeln `file' "`t3' \\"
-	// writeln `file' "`t4' \\"
-	writeln `file' "\midrule"
-	foreach panel in `panels' { //  2 3 4 {
-		writeln `file' " \multicolumn{`=`cols''}{l}{\textbf{`pan`panel''}} \\ "
-
-		foreach v in `vars`panel'' {
-			local vl : variable label `v'
-			if "`vl'"=="" local vl `v'
-			local linemean1 : di `wi1' `"`=subinstr("`vl'","_","",.)'"'
-			local linesd1   : di `wi1' " "
-			local linemean
-			local linesd
-			if strmatch("`v'","*dur*") | strmatch("`v'","*alg*") | strmatch("`v'","*wagedifflev*") | strmatch("`v'","*postuerwa*") {
-				local digits a1
-			}
-			else local digits a1
-			local col 1
-			foreach c in `conditions' {
-
-				// Set factor to 100 in case of dummy variables, not used right now
-				local factor 1
-				if `panel'==3 local factor 1
-
-				qui sum `v'  `wght' if `c'
-				SignificantDigits `digits' `=r(mean)*`factor''
-				local mean     : disp `fmt' `=r(mean)*`factor''
-				if inlist(`col',1,2)&"`v'"=="maxalg"    local mean .
-				local linemean : disp "`linemean' &" `wi2' "`mean'"
-				SignificantDigits `digits' `=r(sd)*`factor''
-				local sd       : disp `fmt' `=r(sd)*`factor''
-				if inlist(`col++',1,2)&"`v'"=="maxalg"  local sd .
-				local linesd   : disp "`linesd' &" `wi2' "`=cond(`sd'!=.,"[`=ltrim("`sd'")']"," ")'"
-			}
-			writeln `file' "`linemean1'`linemean' \\ "
-			writeln `file' "`linesd1'`linesd' \\ "
-		}
-	}
-
-	writeln `file' "\addlinespace"
-	local countline : di `wi1' "Number of Spells"
-	local j 1
-	foreach c in `conditions' {
-		count if `c'
-		local count`j' = r(N)
-		local countline : di "`countline' &" `wi2' "`count`j++''"
-	}
-	writeln `file' "`countline' \\"
-	writeln `file' "\bottomrule"
-	writeln `file' "\end{tabular}"
-	writeln `file' "\textbf{Notes:} Average characteristics of individuals."
-	writeln `file' "Standard deviations in brackets. "
-
-	writeln `file' "\end{threeparttable} "
-	writeln `file' "\end{table}"
-	writeln `file' "\clearpage "
-	writeln `file' " "
-
-
-end // summary_table
 
 /*-------------------------------------------------------*/
 /* Create Analysis File with Treatment and Control Group */
