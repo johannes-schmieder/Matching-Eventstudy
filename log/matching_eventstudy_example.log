@@ -1,0 +1,1539 @@
+-------------------------------------------------------------------------------
+      name:  log
+       log:  /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Cod
+> e/MatchingEventstudy_CodeExample public/do/../log/matching_eventstudy_example
+> .log
+  log type:  text
+ opened on:  21 Nov 2024, 15:30:16
+  - descriptive_analysis, in(${data}analysis_data)
+  = descriptive_analysis, in(../data/analysis_data)
+    -------------------------------------------- begin descriptive_analysis ---
+    - syntax, in(str)
+    - use `in' , clear
+    = use ../data/analysis_data , clear
+    - local file ${log}descriptive_analysis.tex
+    = local file ../log/descriptive_analysis.tex
+    - latexlog `file': open
+    = latexlog ../log/descriptive_analysis.tex: open
+    - latexlog `file': title "Descriptives for Displacement Analysis Sample"
+    = latexlog ../log/descriptive_analysis.tex: title "Descriptives for Displac
+> ement Analysis Sample"
+    - latexlog `file': section "Summary Table"
+    = latexlog ../log/descriptive_analysis.tex: section "Summary Table"
+    - preserve
+    - keep if timesince==-1
+(7,350 observations deleted)
+    - summary_table , panels(1 2 3) out(`file') title(Sample Characteristics at
+>  Baseline (Quarter before Disp t=-1))
+    = summary_table , panels(1 2 3) out(../log/descriptive_analysis.tex) title(
+> Sample Characteristics at Baseline (Quarter before Disp t=-1))
+  724
+  362
+  362
+    - restore
+    - local vars byear age female edyrs earn logearn employed firmsize firmeff
+    - g N = 1
+    - label var N "Number of Observations"
+    - collect clear
+    - foreach column in All Non_Disp Disp {
+    - if "`column'"=="All" local cond 1
+    = if "All"=="All" local cond 1
+    - if "`column'"=="Non_Disp" local cond sep==0
+    = if "All"=="Non_Disp" local cond sep==0
+    - if "`column'"=="Disp" local cond sep==1
+    = if "All"=="Disp" local cond sep==1
+    - egen N_estab = tag(estabid) if timesince==-1 & `cond'
+    = egen N_estab = tag(estabid) if timesince==-1 & 1
+    - table (var) if timesince==-1 , statistic(mean `vars') statistic(sd `vars'
+> ) statistic(count N ) statistic(total N_estab) nformat(%9.1f) nototals name(`
+> column')
+    = table (var) if timesince==-1 , statistic(mean byear age female edyrs earn
+>  logearn employed firmsize firmeff) statistic(sd byear age female edyrs earn 
+> logearn employed firmsize firmeff) statistic(count N ) statistic(total N_esta
+> b) nformat(%9.1f) nototals name(All)
+
+--------------------------------------------------------------------------------------------------------------
+                                         |     Mean   Standard deviation   Number of nonmissing values   Total
+-----------------------------------------+--------------------------------------------------------------------
+Birth Year                               |   1957.1                  9.0                                      
+Age                                      |     41.6                  8.2                                      
+Female                                   |      0.3                  0.5                                      
+Years of Schooling                       |     11.6                  2.3                                      
+Earnings                                 |  12111.7               3465.6                                      
+Log Earnings                             |      9.4                  0.3                                      
+Employed                                 |      1.0                  0.0                                      
+Firm size                                |    498.8                432.2                                      
+Cominbed firm effect (ind + size + rand) |      0.0                  0.1                                      
+Number of Observations                   |                                                       724.0        
+tag(estabid)                             |                                                                94.0
+--------------------------------------------------------------------------------------------------------------
+    - collect addtag group[`column']
+    = collect addtag group[All]
+(20 items changed in collection All)
+    - drop N_estab
+    - }
+    - if "`column'"=="All" local cond 1
+    = if "Non_Disp"=="All" local cond 1
+    - if "`column'"=="Non_Disp" local cond sep==0
+    = if "Non_Disp"=="Non_Disp" local cond sep==0
+    - if "`column'"=="Disp" local cond sep==1
+    = if "Non_Disp"=="Disp" local cond sep==1
+    - egen N_estab = tag(estabid) if timesince==-1 & `cond'
+    = egen N_estab = tag(estabid) if timesince==-1 & sep==0
+    - table (var) if timesince==-1 , statistic(mean `vars') statistic(sd `vars'
+> ) statistic(count N ) statistic(total N_estab) nformat(%9.1f) nototals name(`
+> column')
+    = table (var) if timesince==-1 , statistic(mean byear age female edyrs earn
+>  logearn employed firmsize firmeff) statistic(sd byear age female edyrs earn 
+> logearn employed firmsize firmeff) statistic(count N ) statistic(total N_esta
+> b) nformat(%9.1f) nototals name(Non_Disp)
+
+--------------------------------------------------------------------------------------------------------------
+                                         |     Mean   Standard deviation   Number of nonmissing values   Total
+-----------------------------------------+--------------------------------------------------------------------
+Birth Year                               |   1957.1                  9.0                                      
+Age                                      |     41.6                  8.2                                      
+Female                                   |      0.3                  0.5                                      
+Years of Schooling                       |     11.6                  2.3                                      
+Earnings                                 |  12111.7               3465.6                                      
+Log Earnings                             |      9.4                  0.3                                      
+Employed                                 |      1.0                  0.0                                      
+Firm size                                |    498.8                432.2                                      
+Cominbed firm effect (ind + size + rand) |      0.0                  0.1                                      
+Number of Observations                   |                                                       724.0        
+tag(estabid)                             |                                                                92.0
+--------------------------------------------------------------------------------------------------------------
+    - collect addtag group[`column']
+    = collect addtag group[Non_Disp]
+(20 items changed in collection Non_Disp)
+    - drop N_estab
+    - }
+    - if "`column'"=="All" local cond 1
+    = if "Disp"=="All" local cond 1
+    - if "`column'"=="Non_Disp" local cond sep==0
+    = if "Disp"=="Non_Disp" local cond sep==0
+    - if "`column'"=="Disp" local cond sep==1
+    = if "Disp"=="Disp" local cond sep==1
+    - egen N_estab = tag(estabid) if timesince==-1 & `cond'
+    = egen N_estab = tag(estabid) if timesince==-1 & sep==1
+    - table (var) if timesince==-1 , statistic(mean `vars') statistic(sd `vars'
+> ) statistic(count N ) statistic(total N_estab) nformat(%9.1f) nototals name(`
+> column')
+    = table (var) if timesince==-1 , statistic(mean byear age female edyrs earn
+>  logearn employed firmsize firmeff) statistic(sd byear age female edyrs earn 
+> logearn employed firmsize firmeff) statistic(count N ) statistic(total N_esta
+> b) nformat(%9.1f) nototals name(Disp)
+
+--------------------------------------------------------------------------------------------------------------
+                                         |     Mean   Standard deviation   Number of nonmissing values   Total
+-----------------------------------------+--------------------------------------------------------------------
+Birth Year                               |   1957.1                  9.0                                      
+Age                                      |     41.6                  8.2                                      
+Female                                   |      0.3                  0.5                                      
+Years of Schooling                       |     11.6                  2.3                                      
+Earnings                                 |  12111.7               3465.6                                      
+Log Earnings                             |      9.4                  0.3                                      
+Employed                                 |      1.0                  0.0                                      
+Firm size                                |    498.8                432.2                                      
+Cominbed firm effect (ind + size + rand) |      0.0                  0.1                                      
+Number of Observations                   |                                                       724.0        
+tag(estabid)                             |                                                                93.0
+--------------------------------------------------------------------------------------------------------------
+    - collect addtag group[`column']
+    = collect addtag group[Disp]
+(20 items changed in collection Disp)
+    - drop N_estab
+    - }
+    - collect combine comb = All Non_Disp Disp
+(current collection is comb)
+    - collect style autolevels group All Non_Disp Disp
+    - collect style header result[mean sd] title(hide) level(hide)
+(dimension level(hide) not found)
+(dimension title(hide) not found)
+    - collect style header group, title(hide)
+    - collect style header result, level(hide)
+    - collect style cell result[sd], sformat("[%s]")
+    - collect style cell result[count], nformat("%8.0gc")
+    - collect style cell result[total], nformat("%8.0gc")
+    - collect style cell result, halign(center)
+    - collect style cell var[N], border(top)
+    - collect label levels var N_estab "Number of Establishments", modify
+    - collect label levels group All "All workers" Non_Disp "Non-Displaced" Dis
+> p "Displaced"
+    - collect layout (var#result) (group)
+
+Collection: comb
+      Rows: var#result
+   Columns: group
+   Table 1: 20 x 3
+
+-----------------------------------------------------------------------------------
+                                         |  All workers   Non-Displaced   Displaced
+-----------------------------------------+-----------------------------------------
+Birth Year                               |     1957.1         1957.1        1957.1 
+                                         |     [9.0]          [9.0]         [9.0]  
+Age                                      |      41.6           41.6          41.6  
+                                         |     [8.2]          [8.2]         [8.2]  
+Female                                   |      0.3            0.3           0.3   
+                                         |     [0.5]          [0.5]         [0.5]  
+Years of Schooling                       |      11.6           11.6          11.6  
+                                         |     [2.3]          [2.3]         [2.3]  
+Earnings                                 |    12111.7        12111.7       12111.7 
+                                         |    [3465.6]       [3465.6]      [3465.6]
+Log Earnings                             |      9.4            9.4           9.4   
+                                         |     [0.3]          [0.3]         [0.3]  
+Employed                                 |      1.0            1.0           1.0   
+                                         |     [0.0]          [0.0]         [0.0]  
+Firm size                                |     498.8          498.8         498.8  
+                                         |    [432.2]        [432.2]       [432.2] 
+Cominbed firm effect (ind + size + rand) |      0.0            0.0           0.0   
+                                         |     [0.1]          [0.1]         [0.1]  
+-----------------------------------------+-----------------------------------------
+Number of Observations                   |      724            724           724   
+Number of Establishments                 |       94             92            93   
+-----------------------------------------------------------------------------------
+    - collect preview
+
+-----------------------------------------------------------------------------------
+                                         |  All workers   Non-Displaced   Displaced
+-----------------------------------------+-----------------------------------------
+Birth Year                               |     1957.1         1957.1        1957.1 
+                                         |     [9.0]          [9.0]         [9.0]  
+Age                                      |      41.6           41.6          41.6  
+                                         |     [8.2]          [8.2]         [8.2]  
+Female                                   |      0.3            0.3           0.3   
+                                         |     [0.5]          [0.5]         [0.5]  
+Years of Schooling                       |      11.6           11.6          11.6  
+                                         |     [2.3]          [2.3]         [2.3]  
+Earnings                                 |    12111.7        12111.7       12111.7 
+                                         |    [3465.6]       [3465.6]      [3465.6]
+Log Earnings                             |      9.4            9.4           9.4   
+                                         |     [0.3]          [0.3]         [0.3]  
+Employed                                 |      1.0            1.0           1.0   
+                                         |     [0.0]          [0.0]         [0.0]  
+Firm size                                |     498.8          498.8         498.8  
+                                         |    [432.2]        [432.2]       [432.2] 
+Cominbed firm effect (ind + size + rand) |      0.0            0.0           0.0   
+                                         |     [0.1]          [0.1]         [0.1]  
+-----------------------------------------+-----------------------------------------
+Number of Observations                   |      724            724           724   
+Number of Establishments                 |       94             92            93   
+-----------------------------------------------------------------------------------
+    - latexlog `file': collect export , booktabs novert three title(Summary Sta
+> tistics by Displacement Status) notes(Average characteristics of individuals.
+>  Standard deviations in brackets.)
+    = latexlog ../log/descriptive_analysis.tex: collect export , booktabs nover
+> t three title(Summary Statistics by Displacement Status) notes(Average charac
+> teristics of individuals. Standard deviations in brackets.)
+, booktabs novert three title(Summary Statistics by Displacement Status) notes(
+> Average characteristics of individuals. Standard deviations in brackets.)
+(collection comb exported to file
+ /var/folders/_9/2y5yv8z136xb0j5wc3rp_kr40000gp/T//S_67159.000002)
+    - table (var) if timesince==-1, statistic(p10 `vars') statistic(p25 `vars')
+>  statistic(p50 `vars') statistic(p75 `vars') statistic(p90 `vars') statistic(
+> mean `vars') statistic(sd `vars') statistic(count `vars') nformat(%9.2f)
+    = table (var) if timesince==-1, statistic(p10 byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(p25 byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(p50 byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(p75 byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(p90 byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(mean byear age female edyrs earn 
+> logearn employed firmsize firmeff) statistic(sd byear age female edyrs earn l
+> ogearn employed firmsize firmeff) statistic(count byear age female edyrs earn
+>  logearn employed firmsize firmeff) nformat(%9.2f)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                         |  10th percentile   25th percentile   50th percentile   75th percentile   90th percentile       Mean   Standard deviation   Number of nonmissing values
+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------
+Birth Year                               |          1945.00           1950.00           1957.00           1964.00           1969.00    1957.08                 9.02                        724.00
+Age                                      |            30.00             35.00             41.00             49.00             53.00      41.55                 8.18                        724.00
+Female                                   |             0.00              0.00              0.00              1.00              1.00       0.33                 0.47                        724.00
+Years of Schooling                       |             8.00             10.00             11.00             14.00             15.00      11.57                 2.35                        724.00
+Earnings                                 |          8153.01           9516.40          11477.73          14079.55          16955.90   12111.68              3465.57                        724.00
+Log Earnings                             |             9.01              9.16              9.35              9.55              9.74       9.36                 0.28                        724.00
+Employed                                 |             1.00              1.00              1.00              1.00              1.00       1.00                 0.00                        724.00
+Firm size                                |           111.03            175.44            366.99            629.32           1099.06     498.81               432.17                        724.00
+Cominbed firm effect (ind + size + rand) |            -0.14              0.04              0.06              0.06              0.07       0.02                 0.08                        724.00
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    - collect label levels result p10 "10th pct", modify
+    - collect label levels result p25 "25th pct", modify
+    - collect label levels result p50 "50th pct", modify
+    - collect label levels result p75 "75th pct", modify
+    - collect label levels result p90 "90th pct", modify
+    - collect label levels result mean "Mean", modify
+    - collect label levels result sd "SD", modify
+    - collect label levels result count "N", modify
+    - collect style cell result[sd], sformat("[%s]")
+    - collect style cell result[count], nformat("%8.0gc")
+    - collect style cell result, halign(center)
+    - collect style cell var[N], border(top)
+(level N of dimension var not found)
+    - collect preview
+
+-----------------------------------------------------------------------------------------------------------------------------
+                                         |  10th pct   25th pct   50th pct   75th pct   90th pct     Mean         SD       N 
+-----------------------------------------+-----------------------------------------------------------------------------------
+Birth Year                               |   1945.00    1950.00    1957.00    1964.00    1969.00    1957.08     [9.02]    724
+Age                                      |    30.00      35.00      41.00      49.00      53.00      41.55      [8.18]    724
+Female                                   |    0.00       0.00       0.00       1.00       1.00       0.33       [0.47]    724
+Years of Schooling                       |    8.00       10.00      11.00      14.00      15.00      11.57      [2.35]    724
+Earnings                                 |   8153.01    9516.40   11477.73   14079.55   16955.90   12111.68   [3465.57]   724
+Log Earnings                             |    9.01       9.16       9.35       9.55       9.74       9.36       [0.28]    724
+Employed                                 |    1.00       1.00       1.00       1.00       1.00       1.00       [0.00]    724
+Firm size                                |   111.03     175.44     366.99     629.32     1099.06    498.81     [432.17]   724
+Cominbed firm effect (ind + size + rand) |    -0.14      0.04       0.06       0.06       0.07       0.02       [0.08]    724
+-----------------------------------------------------------------------------------------------------------------------------
+    - latexlog `file': collect export , booktabs novert three title(Summary Sta
+> tistics with Percentiles)
+    = latexlog ../log/descriptive_analysis.tex: collect export , booktabs nover
+> t three title(Summary Statistics with Percentiles)
+, booktabs novert three title(Summary Statistics with Percentiles)
+(collection Table exported to file
+ /var/folders/_9/2y5yv8z136xb0j5wc3rp_kr40000gp/T//S_67159.000002)
+    - table (industry) (sep) if timesince==-1, statistic(percent, across(indust
+> ry)) nformat(%9.3f) totals(sep)
+
+----------------------------------------------------
+                        |             sep           
+                        |  Non-displaced   displaced
+------------------------+---------------------------
+Industry                |                           
+  Mining                |         14.088      14.088
+  Construction          |         13.260      13.260
+  Manufacturing         |         13.812      13.812
+  Health                |         11.326      11.326
+  Finance               |         18.508      18.508
+  FCSL                  |         18.508      18.508
+  Professional Services |         10.497      10.497
+  Total                 |        100.000     100.000
+----------------------------------------------------
+    - collect style cell result, nformat("%8.1f")
+    - collect style cell result, halign(center)
+    - collect style cell var[N], border(top)
+(dimension var not found)
+    - collect label levels sep 0 "Non-displaced" 1 "Displaced", modify
+    - collect style header sep, title(hide)
+    - collect style header industry, title(hide)
+    - collect preview
+
+--------------------------------------------------
+                      |  Non-displaced   Displaced
+----------------------+---------------------------
+        Mining        |       14.1          14.1  
+     Construction     |       13.3          13.3  
+    Manufacturing     |       13.8          13.8  
+        Health        |       11.3          11.3  
+       Finance        |       18.5          18.5  
+         FCSL         |       18.5          18.5  
+Professional Services |       10.5          10.5  
+        Total         |      100.0         100.0  
+--------------------------------------------------
+    - latexlog `file': collect export , booktabs novert three title(Industry Di
+> stribution by Displacement Status)
+    = latexlog ../log/descriptive_analysis.tex: collect export , booktabs nover
+> t three title(Industry Distribution by Displacement Status)
+, booktabs novert three title(Industry Distribution by Displacement Status)
+(collection Table exported to file
+ /var/folders/_9/2y5yv8z136xb0j5wc3rp_kr40000gp/T//S_67159.000002)
+    - table (industry) (year) if timesince==-1, nototals
+
+-----------------------------------------------------------------------------------------------------
+                        |                                     year                                   
+                        |  1993   1994   1995   1996   1997   1999   2000   2001   2002   2003   2004
+------------------------+----------------------------------------------------------------------------
+Industry                |                                                                            
+  Mining                |     6      2     18      6     12      6     10     10     12     16      4
+  Construction          |    12     16      8      8      4            14     12     12      6      4
+  Manufacturing         |    16      4     20      4      6            18      6      8      8     10
+  Health                |    14            14      2     10      4      6     18      4      6      4
+  Finance               |    12     14     24            12      4     10     14     16     20      8
+  FCSL                  |    10     10     14     12      6            16     12     30     16      8
+  Professional Services |     8      6             8      6     10            10            16     12
+-----------------------------------------------------------------------------------------------------
+    - collect style header year, title(hide)
+    - collect style header industry, title(hide)
+    - latexlog `file': collect export , booktabs novert three title(Number of W
+> orkers by Industry and Year) notes(Each cell shows number of workers per cell
+> )
+    = latexlog ../log/descriptive_analysis.tex: collect export , booktabs nover
+> t three title(Number of Workers by Industry and Year) notes(Each cell shows n
+> umber of workers per cell)
+, booktabs novert three title(Number of Workers by Industry and Year) notes(Eac
+> h cell shows number of workers per cell)
+(collection Table exported to file
+ /var/folders/_9/2y5yv8z136xb0j5wc3rp_kr40000gp/T//S_67159.000002)
+    - latexlog `file': section "Consistency Checks"
+    = latexlog ../log/descriptive_analysis.tex: section "Consistency Checks"
+    - cap mkdir ${log}Consistency/
+    = cap mkdir ../log/Consistency/
+    - cellgraph N , by(time) nonotes stat(sum)
+    - latexlog `file': addfig, file(Consistency/counts_by_time.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/counts
+> _by_time.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: counts_by_time
+Fileend: pdf
+Filename: counts_by_time.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Consistency/counts_by_time.pdf saved as PDF format
+    - cellgraph earn , by(time) nonotes stat(mean)
+    - latexlog `file': addfig, file(Consistency/earn_by_time.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/earn_b
+> y_time.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: earn_by_time
+Fileend: pdf
+Filename: earn_by_time.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample public/do/../log/Consistency/earn_by_time.pdf
+    saved as PDF format
+    - cellgraph logearn , by(time) nonotes stat(mean)
+    - latexlog `file': addfig, file(Consistency/logearn_by_time.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/logear
+> n_by_time.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: logearn_by_time
+Fileend: pdf
+Filename: logearn_by_time.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Consistency/logearn_by_time.pdf saved as PDF format
+    - cellgraph logearn , by(time) nonotes stat(p10 p25 p50 p75 p90)
+    - latexlog `file': addfig, file(Consistency/logearn_by_year_pct.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/logear
+> n_by_year_pct.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: logearn_by_year_pct
+Fileend: pdf
+Filename: logearn_by_year_pct.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Consistency/logearn_by_year_pct.pdf saved as PDF format
+    - cellgraph employed , by(time) nonotes
+    - latexlog `file': addfig, file(Consistency/employed_by_time.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/employ
+> ed_by_time.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: employed_by_time
+Fileend: pdf
+Filename: employed_by_time.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Consistency/employed_by_time.pdf saved as PDF format
+    - cellgraph displaced , by(time) nonotes
+    - latexlog `file': addfig, file(Consistency/displaced_by_time.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Consistency/displa
+> ced_by_time.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Consistency/
+Filestub: displaced_by_time
+Fileend: pdf
+Filename: displaced_by_time.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Consistency/displaced_by_time.pdf saved as PDF format
+    - latexlog `file': section "Treatment and Control around Displacement Event
+> "
+    = latexlog ../log/descriptive_analysis.tex: section "Treatment and Control 
+> around Displacement Event"
+    - cap mkdir ${log}Disp_event_raw/
+    = cap mkdir ../log/Disp_event_raw/
+    - cellgraph N , by(timesince sep) nonotes stat(sum)
+(32 missing values generated)
+(32 real changes made)
+noci
+noci
+    - latexlog `file': addfig, file(Disp_event_raw/counts_by_timesince.pdf) eol
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Disp_event_raw/cou
+> nts_by_timesince.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Disp_event_raw/
+Filestub: counts_by_timesince
+Fileend: pdf
+Filename: counts_by_timesince.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Disp_event_raw/counts_by_timesince.pdf saved as PDF
+    format
+    - cellgraph earn , by(timesince sep) nonotes
+(32 missing values generated)
+(32 real changes made)
+
+
+    - latexlog `file': addfig, file(Disp_event_raw/logearn_by_timesince.pdf) eo
+> l
+    = latexlog ../log/descriptive_analysis.tex: addfig, file(Disp_event_raw/log
+> earn_by_timesince.pdf) eol
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+
+macros:
+           r(filename) : "descriptive_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "descriptive_analysis"
+               r(path) : "../log/"
+../log/
+Path: Disp_event_raw/
+Filestub: logearn_by_timesince
+Fileend: pdf
+Filename: logearn_by_timesince.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Disp_event_raw/logearn_by_timesince.pdf saved as PDF
+    format
+    - latexlog `file': close
+    = latexlog ../log/descriptive_analysis.tex: close
+    - latexlog `file': pdf, view
+    = latexlog ../log/descriptive_analysis.tex: pdf, view
+Path: ../log/
+Filestub: descriptive_analysis
+Fileend: tex
+Filename: descriptive_analysis.tex
+/Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/MatchingEve
+> ntstudy_CodeExample public/log
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded form
+> at=pdflatex)
+ \write18 enabled.
+ Source specials enabled.
+entering extended mode
+(./descriptive_analysis.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24>
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/size10.clo))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/lscape.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-def/pdftex.def))))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/rotating.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphicx.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/ifthen.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/threeparttable/threeparttable.sty
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/caption/subcaption.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/caption.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/caption3.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/ltcaption.sty)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/tabularx.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/array.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-cfg/color.cfg))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/colortbl/colortbl.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/url/url.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/usr/local/texlive/2022/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file descriptive_analysis.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: letterpaper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(71.13188pt, 451.01793pt, 92.14519pt)
+* v-part:(T,H,B)=(71.13188pt, 628.44073pt, 95.39737pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=451.01793pt
+* \textheight=628.44073pt
+* \oddsidemargin=-1.1381pt
+* \evensidemargin=-1.1381pt
+* \topmargin=-38.1381pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty))
+
+LaTeX Warning: No \author given.
+
+[1{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+[2]
+Overfull \hbox (116.81653pt too wide) in paragraph at lines 158--258
+ [] 
+
+Overfull \hbox (3.34401pt too wide) in paragraph at lines 303--411
+ [] 
+
+Underfull \hbox (badness 10000) in paragraph at lines 413--419
+
+[3] [4]
+Overfull \vbox (5.12886pt too high) has occurred while \output is active
+[5 <./Consistency/counts_by_time.pdf> <./Consistency/earn_by_time.pdf>]
+[6 <./Consistency/logearn_by_time.pdf> <./Consistency/logearn_by_year_pct.pdf>]
+
+Underfull \hbox (badness 10000) in paragraph at lines 420--422
+
+[7 <./Consistency/employed_by_time.pdf> <./Consistency/displaced_by_time.pdf>]
+[8]
+Overfull \vbox (5.12886pt too high) has occurred while \output is active
+[9 <./Disp_event_raw/counts_by_timesince.pdf> <./Disp_event_raw/logearn_by_time
+since.pdf>] [10] (./descriptive_analysis.aux)
+
+Package rerunfilecheck Warning: File `descriptive_analysis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/local/texlive/2022/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2022/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2022/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2022/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2022/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2022/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmr8.pfb>
+Output written on descriptive_analysis.pdf (10 pages, 227064 bytes).
+Transcript written on descriptive_analysis.log.
+/Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/MatchingEve
+> ntstudy_CodeExample public/do
+
+    ---------------------------------------------- end descriptive_analysis ---
+  - eventstudy_analysis, in(${data}analysis_data)
+  = eventstudy_analysis, in(../data/analysis_data)
+    --------------------------------------------- begin eventstudy_analysis ---
+    - syntax , [ in(str) from(int -5) to(int 10) omit(int -1) ]
+    - use `in' if timesince>=`from', clear
+    = use ../data/analysis_data if timesince>=-5, clear
+    - egen persid2 = group(baselinetime persid)
+    - qui tab year, gen(_Dyear)
+    - drop _Dyear1
+    - qui tab timesince, gen(_DtimesinceTreat)
+    - foreach v of varlist _Dtime* {
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat1 = 0 if sep==0
+(323 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat2 = 0 if sep==0
+(362 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat3 = 0 if sep==0
+(362 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat4 = 0 if sep==0
+(362 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat5 = 0 if sep==0
+(362 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat6 = 0 if sep==0
+(362 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat7 = 0 if sep==0
+(337 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat8 = 0 if sep==0
+(293 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat9 = 0 if sep==0
+(252 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat10 = 0 if sep==0
+(211 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat11 = 0 if sep==0
+(174 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat12 = 0 if sep==0
+(162 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat13 = 0 if sep==0
+(162 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat14 = 0 if sep==0
+(134 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat15 = 0 if sep==0
+(114 real changes made)
+    - }
+    - replace `v' = 0 if sep==0
+    = replace _DtimesinceTreat16 = 0 if sep==0
+(65 real changes made)
+    - }
+    - local omitdum = `omit'-`from'+1
+    = local omitdum = -1--5+1
+    - drop _DtimesinceTreat`omitdum'
+    = drop _DtimesinceTreat5
+    - local omitcat omit(`omit')
+    = local omitcat omit(-1)
+    - qui tab timesince, gen(_DtimesinceAll)
+    - g age2 = age^2
+(24 missing values generated)
+    - g age3 = age^3
+(24 missing values generated)
+    - g age4 = age^4
+(24 missing values generated)
+    - local controls age age2 age3 age4
+    - local i 100
+    - local treatment_effect -0.2
+    - local file ${log}eventstudy_analysis.tex
+    = local file ../log/eventstudy_analysis.tex
+    - cap mkdir ${log}Eventstudy/
+    = cap mkdir ../log/Eventstudy/
+    - latexlog `file': open
+    = latexlog ../log/eventstudy_analysis.tex: open
+    - latexlog `file': title "Eventstudy Analysis for Displacement Events"
+    = latexlog ../log/eventstudy_analysis.tex: title "Eventstudy Analysis for D
+> isplacement Events"
+    - cellgraph logearn, by(timesince sep) title(Raw Means for Disp and Non-Dis
+> p Workers)
+(32 missing values generated)
+(32 real changes made)
+
+
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_RawMeans.pdf) eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_RawMeans.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_RawMeans
+Fileend: pdf
+Filename: eventstudy_RawMeans.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_RawMeans.pdf saved as PDF format
+    - local opt ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off)
+    - reg logearn _DtimesinceTreat* _DtimesinceAll* `controls',
+    = reg logearn _DtimesinceTreat* _DtimesinceAll* age age2 age3 age4,
+note: _DtimesinceAll15 omitted because of collinearity.
+
+      Source |       SS           df       MS      Number of obs   =     8,050
+-------------+----------------------------------   F(34, 8015)     =     43.99
+       Model |  103.277838        34  3.03758348   Prob > F        =    0.0000
+    Residual |  553.440403     8,015   .06905058   R-squared       =    0.1573
+-------------+----------------------------------   Adj R-squared   =    0.1537
+       Total |  656.718241     8,049  .081590041   Root MSE        =    .26277
+
+------------------------------------------------------------------------------
+     logearn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+_Dtimesin~t1 |  -.0103298   .0210532    -0.49   0.624    -.0515996      .03094
+_Dtimesin~t2 |  -.0172248   .0195367    -0.88   0.378    -.0555219    .0210723
+_Dtimesin~t3 |  -.0154948   .0195349    -0.79   0.428    -.0537884    .0227987
+_Dtimesin~t4 |   -.019066   .0195341    -0.98   0.329    -.0573579    .0192258
+_Dtimesin~t6 |  -.2025913   .0195335   -10.37   0.000    -.2408821   -.1643006
+_Dtimesin~t7 |  -.2102433   .0202449   -10.38   0.000    -.2499286   -.1705579
+_Dtimesin~t8 |  -.2171888   .0217126   -10.00   0.000    -.2597511   -.1746266
+_Dtimesin~t9 |  -.1916262   .0234117    -8.19   0.000    -.2375193   -.1457332
+_Dtimesi~t10 |  -.1957149   .0255841    -7.65   0.000    -.2458664   -.1455634
+_Dtimesi~t11 |  -.1743908   .0281748    -6.19   0.000    -.2296208   -.1191609
+_Dtimesi~t12 |  -.1714663   .0292025    -5.87   0.000    -.2287108   -.1142218
+_Dtimesi~t13 |  -.1457509   .0292057    -4.99   0.000    -.2030016   -.0885002
+_Dtimesi~t14 |   -.191843   .0321259    -5.97   0.000    -.2548181   -.1288679
+_Dtimesi~t15 |  -.1187271   .0348283    -3.41   0.001    -.1869997   -.0504545
+_Dtimesi~t16 |  -.1309925   .0464531    -2.82   0.005    -.2220527   -.0399323
+_Dtimesin~l1 |  -.0621486   .0295072    -2.11   0.035    -.1199904   -.0043068
+_Dtimesin~l2 |  -.0564801   .0289547    -1.95   0.051    -.1132389    .0002787
+_Dtimesin~l3 |   -.026848   .0288946    -0.93   0.353    -.0834889     .029793
+_Dtimesin~l4 |  -.0109567   .0288511    -0.38   0.704    -.0675124    .0455991
+_Dtimesin~l5 |  -.0010579   .0270931    -0.04   0.969    -.0541674    .0520517
+_Dtimesin~l6 |   .0243025   .0287719     0.84   0.398    -.0320979    .0807029
+_Dtimesin~l7 |   .0383108   .0289692     1.32   0.186    -.0184764    .0950979
+_Dtimesin~l8 |    .036011    .029455     1.22   0.222    -.0217284    .0937504
+_Dtimesin~l9 |   .0293568   .0300472     0.98   0.329    -.0295436    .0882572
+_Dtimesi~l10 |   .0211119   .0308539     0.68   0.494    -.0393699    .0815936
+_Dtimesi~l11 |   .0221825   .0318923     0.70   0.487    -.0403347    .0846997
+_Dtimesi~l12 |   .0317147   .0322895     0.98   0.326    -.0315811    .0950105
+_Dtimesi~l13 |   .0276784   .0322208     0.86   0.390    -.0354827    .0908395
+_Dtimesi~l14 |   .0694891   .0335163     2.07   0.038     .0037886    .1351897
+_Dtimesi~l15 |          0  (omitted)
+_Dtimesi~l16 |   .0282044   .0410475     0.69   0.492    -.0522594    .1086681
+         age |   -.031659   .1071435    -0.30   0.768    -.2416881    .1783702
+        age2 |   .0008186    .003797     0.22   0.829    -.0066246    .0082617
+        age3 |  -2.20e-06   .0000585    -0.04   0.970    -.0001169    .0001125
+        age4 |  -4.77e-08   3.32e-07    -0.14   0.886    -6.97e-07    6.02e-07
+       _cons |   9.563558    1.10747     8.64   0.000     7.392629    11.73449
+------------------------------------------------------------------------------
+    - eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effe
+> ct') name(g`i++') `omitcat' tit(OLS - Rel. Year Specification) subtit(Control
+> . for Person FE; Year Since Event (for Disp and Non-Disp)) ytitle(Log Earning
+> s) `opt'
+    = eventstudy_figure, from(-5) to(10) treatment_effect(-0.2) name(g100) omit
+> (-1) tit(OLS - Rel. Year Specification) subtit(Control. for Person FE; Year S
+> ince Event (for Disp and Non-Disp)) ytitle(Log Earnings) ysize(8) xsize(12) x
+> line(-0.5, lcol(gray)) legend(off)
+16
+number of observations will be reset to 15
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 15.
+(0 observations deleted)
+(1 observation created)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(4 real changes made)
+(11 missing values generated)
+(11 real changes made)
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_OLS.pdf) eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_OLS.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_OLS
+Fileend: pdf
+Filename: eventstudy_OLS.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_OLS.pdf saved as PDF format
+    - xtreg logearn _DtimesinceTreat* _Dyear* `controls', fe i(persid2)
+    = xtreg logearn _DtimesinceTreat* _Dyear* age age2 age3 age4, fe i(persid2)
+warning: existing panel variable is not persid2
+note: age omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =      8,050
+Group variable: persid2                         Number of groups  =        724
+
+R-squared:                                      Obs per group:
+     Within  = 0.3324                                         min =          5
+     Between = 0.0163                                         avg =       11.1
+     Overall = 0.0028                                         max =         16
+
+                                                F(33, 7293)       =     110.04
+corr(u_i, Xb) = -0.8838                         Prob > F          =     0.0000
+
+------------------------------------------------------------------------------
+     logearn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+_Dtimesin~t1 |  -.0084553   .0101543    -0.83   0.405    -.0283608    .0114501
+_Dtimesin~t2 |  -.0170086   .0096594    -1.76   0.078    -.0359438    .0019266
+_Dtimesin~t3 |  -.0045998   .0094434    -0.49   0.626    -.0231115    .0139119
+_Dtimesin~t4 |  -.0108618   .0093732    -1.16   0.247    -.0292359    .0075124
+_Dtimesin~t6 |  -.1912691   .0093611   -20.43   0.000    -.2096195   -.1729187
+_Dtimesin~t7 |  -.1918146   .0096192   -19.94   0.000     -.210671   -.1729582
+_Dtimesin~t8 |  -.2028801   .0101802   -19.93   0.000    -.2228363    -.182924
+_Dtimesin~t9 |  -.1902139   .0107783   -17.65   0.000    -.2113426   -.1690852
+_Dtimesi~t10 |  -.1945222    .011551   -16.84   0.000    -.2171656   -.1718789
+_Dtimesi~t11 |  -.1768574   .0123925   -14.27   0.000    -.2011502   -.1525646
+_Dtimesi~t12 |  -.1688091   .0127863   -13.20   0.000    -.1938741   -.1437442
+_Dtimesi~t13 |   -.161245   .0129395   -12.46   0.000    -.1866102   -.1358797
+_Dtimesi~t14 |  -.1681324   .0139891   -12.02   0.000     -.195555   -.1407098
+_Dtimesi~t15 |  -.1678803   .0150927   -11.12   0.000    -.1974663   -.1382942
+_Dtimesi~t16 |  -.1560922   .0187375    -8.33   0.000    -.1928232   -.1193613
+     _Dyear2 |   .0710479   .0587523     1.21   0.227    -.0441236    .1862194
+     _Dyear3 |   .1521088   .1146989     1.33   0.185    -.0727342    .3769518
+     _Dyear4 |   .2249034   .1715046     1.31   0.190    -.1112953    .5611022
+     _Dyear5 |   .3015661   .2283959     1.32   0.187    -.1461559     .749288
+     _Dyear6 |   .3781377   .2852998     1.33   0.185    -.1811324    .9374078
+     _Dyear7 |   .4549608    .342381     1.33   0.184    -.2162049    1.126127
+     _Dyear8 |   .5254987   .3994522     1.32   0.188    -.2575431    1.308541
+     _Dyear9 |   .6010861   .4565604     1.32   0.188    -.2939044    1.496077
+    _Dyear10 |   .6824629    .513564     1.33   0.184    -.3242711    1.689197
+    _Dyear11 |   .7640416   .5706201     1.34   0.181    -.3545389    1.882622
+    _Dyear12 |   .8451109   .6276297     1.35   0.178    -.3852249    2.075447
+    _Dyear13 |   .9140063   .6846805     1.33   0.182    -.4281656    2.256178
+    _Dyear14 |   .9764552   .7417799     1.32   0.188     -.477648    2.430558
+    _Dyear15 |   1.051889   .7989443     1.32   0.188    -.5142734    2.618051
+    _Dyear16 |   1.124571   .8560475     1.31   0.189    -.5535303    2.802671
+         age |          0  (omitted)
+        age2 |  -.0018969   .0020231    -0.94   0.348    -.0058628    .0020689
+        age3 |   .0000316   .0000312     1.02   0.310    -.0000294    .0000927
+        age4 |  -1.91e-07   1.76e-07    -1.09   0.278    -5.37e-07    1.54e-07
+       _cons |   10.34364   1.359508     7.61   0.000     7.678615    13.00867
+-------------+----------------------------------------------------------------
+     sigma_u |  .56308311
+     sigma_e |  .12466182
+         rho |  .95327594   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0: F(723, 7293) = 34.70                  Prob > F = 0.0000
+    - eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effe
+> ct') name(g`i++') `omitcat' tit(JLS Specification) subtit(Controlling for Yea
+> r and Person FE) ytitle(Log Earnings) `opt'
+    = eventstudy_figure, from(-5) to(10) treatment_effect(-0.2) name(g101) omit
+> (-1) tit(JLS Specification) subtit(Controlling for Year and Person FE) ytitle
+> (Log Earnings) ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off)
+16
+number of observations will be reset to 15
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 15.
+(0 observations deleted)
+(1 observation created)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(4 real changes made)
+(11 missing values generated)
+(11 real changes made)
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_FE_JLS.pdf) eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_FE_JLS.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_FE_JLS
+Fileend: pdf
+Filename: eventstudy_FE_JLS.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_FE_JLS.pdf saved as PDF format
+    - xtreg logearn _DtimesinceTreat* _DtimesinceAll* `controls', fe i(persid2)
+    = xtreg logearn _DtimesinceTreat* _DtimesinceAll* age age2 age3 age4, fe i(
+> persid2)
+note: _DtimesinceAll16 omitted because of collinearity.
+note: age omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =      8,050
+Group variable: persid2                         Number of groups  =        724
+
+R-squared:                                      Obs per group:
+     Within  = 0.3338                                         min =          5
+     Between = 0.0755                                         avg =       11.1
+     Overall = 0.0045                                         max =         16
+
+                                                F(33, 7293)       =     110.75
+corr(u_i, Xb) = -0.6223                         Prob > F          =     0.0000
+
+------------------------------------------------------------------------------
+     logearn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+_Dtimesin~t1 |   .0026603   .0136539     0.19   0.846    -.0241052    .0294259
+_Dtimesin~t2 |  -.0138439   .0130916    -1.06   0.290    -.0395073    .0118194
+_Dtimesin~t3 |  -.0119691   .0130908    -0.91   0.361    -.0376307    .0136926
+_Dtimesin~t4 |  -.0154283   .0130904    -1.18   0.239    -.0410893    .0102326
+_Dtimesin~t6 |   -.198826   .0130903   -15.19   0.000    -.2244869   -.1731652
+_Dtimesin~t7 |  -.2056257    .013371   -15.38   0.000    -.2318367   -.1794146
+_Dtimesin~t8 |  -.2095558   .0139509   -15.02   0.000    -.2369037    -.182208
+_Dtimesin~t9 |  -.1931122     .01463   -13.20   0.000    -.2217911   -.1644332
+_Dtimesi~t10 |   -.199542   .0155133   -12.86   0.000    -.2299526   -.1691314
+_Dtimesi~t11 |   -.178652    .016588   -10.77   0.000    -.2111693   -.1461347
+_Dtimesi~t12 |   -.172836   .0170201   -10.15   0.000    -.2062004   -.1394716
+_Dtimesi~t13 |  -.1472348   .0170224    -8.65   0.000    -.1806037   -.1138659
+_Dtimesi~t14 |  -.1974988   .0182568   -10.82   0.000    -.2332875   -.1617102
+_Dtimesi~t15 |   -.128895   .0194172    -6.64   0.000    -.1669584   -.0908316
+_Dtimesi~t16 |  -.1512696   .0245828    -6.15   0.000     -.199459   -.1030801
+_Dtimesin~l1 |  -.6834016   .8691924    -0.79   0.432     -2.38727    1.020467
+_Dtimesin~l2 |  -.6280044   .8114284    -0.77   0.439    -2.218639    .9626301
+_Dtimesin~l3 |  -.5704277   .7538813    -0.76   0.449    -2.048253    .9073976
+_Dtimesin~l4 |  -.5264421    .696232    -0.76   0.450    -1.891258    .8383741
+_Dtimesin~l5 |  -.4864964   .6385019    -0.76   0.446    -1.738145    .7651519
+_Dtimesin~l6 |  -.4347673    .580708    -0.75   0.454    -1.573123    .7035884
+_Dtimesin~l7 |  -.3846935    .522851    -0.74   0.462    -1.409633    .6402457
+_Dtimesin~l8 |  -.3466209   .4650222    -0.75   0.456    -1.258199    .5649571
+_Dtimesin~l9 |  -.3032695   .4070613    -0.75   0.456    -1.101227    .4946884
+_Dtimesi~l10 |  -.2527155   .3491119    -0.72   0.469    -.9370758    .4316448
+_Dtimesi~l11 |  -.2074605   .2912411    -0.71   0.476    -.7783774    .3634564
+_Dtimesi~l12 |   -.160067   .2333628    -0.69   0.493    -.6175256    .2973916
+_Dtimesi~l13 |  -.1369657   .1755022    -0.78   0.435    -.4810007    .2070694
+_Dtimesi~l14 |  -.0515944   .1179911    -0.44   0.662    -.2828912    .1797024
+_Dtimesi~l15 |  -.0795918   .0613743    -1.30   0.195    -.1999033    .0407196
+_Dtimesi~l16 |          0  (omitted)
+         age |          0  (omitted)
+        age2 |  -.0008746   .0020501    -0.43   0.670    -.0048934    .0031443
+        age3 |   .0000162   .0000316     0.51   0.607    -.0000456    .0000781
+        age4 |  -1.05e-07   1.78e-07    -0.59   0.557    -4.55e-07    2.45e-07
+       _cons |   10.47868   2.450115     4.28   0.000     5.675749    15.28162
+-------------+----------------------------------------------------------------
+     sigma_u |  .33649693
+     sigma_e |  .12452973
+         rho |  .87954083   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0: F(723, 7293) = 39.27                  Prob > F = 0.0000
+    - eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effe
+> ct') name(g`i++') `omitcat' tit(Rel. Year Specification) subtit(Control. for 
+> Person FE; Year Since Event (for Disp and Non-Disp)) ytitle(Log Earnings) `op
+> t'
+    = eventstudy_figure, from(-5) to(10) treatment_effect(-0.2) name(g102) omit
+> (-1) tit(Rel. Year Specification) subtit(Control. for Person FE; Year Since E
+> vent (for Disp and Non-Disp)) ytitle(Log Earnings) ysize(8) xsize(12) xline(-
+> 0.5, lcol(gray)) legend(off)
+16
+number of observations will be reset to 15
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 15.
+(0 observations deleted)
+(1 observation created)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(4 real changes made)
+(11 missing values generated)
+(11 real changes made)
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_FE_RelYear.pdf) eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_FE_RelYear.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_FE_RelYear
+Fileend: pdf
+Filename: eventstudy_FE_RelYear.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_FE_RelYear.pdf saved as PDF format
+    - xtreg logearn _DtimesinceTreat* _Dyear* _DtimesinceAll* `controls', fe i(
+> persid2)
+    = xtreg logearn _DtimesinceTreat* _Dyear* _DtimesinceAll* age age2 age3 age
+> 4, fe i(persid2)
+note: _DtimesinceAll15 omitted because of collinearity.
+note: _DtimesinceAll16 omitted because of collinearity.
+note: age omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =      8,050
+Group variable: persid2                         Number of groups  =        724
+
+R-squared:                                      Obs per group:
+     Within  = 0.3354                                         min =          5
+     Between = 0.0083                                         avg =       11.1
+     Overall = 0.0267                                         max =         16
+
+                                                F(47, 7279)       =      78.15
+corr(u_i, Xb) = -0.6990                         Prob > F          =     0.0000
+
+------------------------------------------------------------------------------
+     logearn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+_Dtimesin~t1 |   .0027213   .0136514     0.20   0.842    -.0240394     .029482
+_Dtimesin~t2 |  -.0138422   .0130891    -1.06   0.290    -.0395007    .0118162
+_Dtimesin~t3 |  -.0119687   .0130882    -0.91   0.361    -.0376255    .0136881
+_Dtimesin~t4 |  -.0154285   .0130879    -1.18   0.239    -.0410845    .0102275
+_Dtimesin~t6 |  -.1988254   .0130878   -15.19   0.000    -.2244813   -.1731694
+_Dtimesin~t7 |  -.2056202   .0133684   -15.38   0.000    -.2318262   -.1794142
+_Dtimesin~t8 |  -.2095515   .0139482   -15.02   0.000    -.2368941   -.1822089
+_Dtimesin~t9 |  -.1931029   .0146272   -13.20   0.000    -.2217764   -.1644294
+_Dtimesi~t10 |  -.1995351   .0155104   -12.86   0.000    -.2299399   -.1691303
+_Dtimesi~t11 |  -.1786545   .0165848   -10.77   0.000    -.2111655   -.1461434
+_Dtimesi~t12 |  -.1728488   .0170169   -10.16   0.000    -.2062068   -.1394908
+_Dtimesi~t13 |  -.1472533   .0170192    -8.65   0.000    -.1806158   -.1138907
+_Dtimesi~t14 |  -.1975338   .0182533   -10.82   0.000    -.2333156   -.1617519
+_Dtimesi~t15 |  -.1289325   .0194135    -6.64   0.000    -.1669887   -.0908764
+_Dtimesi~t16 |  -.1512994   .0245784    -6.16   0.000    -.1994802   -.1031187
+     _Dyear2 |   .0713745   .0629837     1.13   0.257    -.0520917    .1948407
+     _Dyear3 |   .1532141    .123404     1.24   0.214    -.0886935    .3951218
+     _Dyear4 |   .2275165   .1846436     1.23   0.218    -.1344385    .5894715
+     _Dyear5 |   .3048623   .2459691     1.24   0.215    -.1773085    .7870331
+     _Dyear6 |   .3828939   .3072665     1.25   0.213    -.2194375    .9852252
+     _Dyear7 |   .4632896    .368655     1.26   0.209     -.259381     1.18596
+     _Dyear8 |   .5367225   .4300226     1.25   0.212    -.3062464    1.379691
+     _Dyear9 |   .6146212   .4914472     1.25   0.211    -.3487578       1.578
+    _Dyear10 |   .6987564   .5527835     1.26   0.206    -.3848597    1.782372
+    _Dyear11 |   .7822787   .6141914     1.27   0.203    -.4217146    1.986272
+    _Dyear12 |   .8658122   .6755706     1.28   0.200    -.4585021    2.190126
+    _Dyear13 |   .9344074   .7369678     1.27   0.205    -.5102632    2.379078
+    _Dyear14 |    1.00285   .7985083     1.26   0.209     -.562458    2.568157
+    _Dyear15 |   1.078515   .8596945     1.25   0.210     -.606736    2.763765
+    _Dyear16 |   1.156424   .9212799     1.26   0.209    -.6495512      2.9624
+_Dtimesin~l1 |   .5209404   .2842729     1.83   0.067    -.0363169    1.078198
+_Dtimesin~l2 |   .4939268   .2645175     1.87   0.062    -.0246042    1.012458
+_Dtimesin~l3 |   .4703473   .2447561     1.92   0.055    -.0094455    .9501402
+_Dtimesin~l4 |   .4330645   .2249543     1.93   0.054    -.0079112    .8740403
+_Dtimesin~l5 |    .393715   .2051966     1.92   0.055    -.0085298    .7959599
+_Dtimesin~l6 |   .3661858   .1854597     1.97   0.048      .002631    .7297405
+_Dtimesin~l7 |    .337085   .1657127     2.03   0.042       .01224    .6619301
+_Dtimesin~l8 |   .2944553   .1460039     2.02   0.044     .0082454    .5806653
+_Dtimesin~l9 |   .2552855   .1263559     2.02   0.043     .0075914    .5029796
+_Dtimesi~l10 |   .2224716     .10672     2.08   0.037     .0132694    .4316738
+_Dtimesi~l11 |   .1837591   .0871174     2.11   0.035     .0129839    .3545344
+_Dtimesi~l12 |   .1515655   .0677845     2.24   0.025     .0186882    .2844427
+_Dtimesi~l13 |   .0970859   .0484514     2.00   0.045     .0021071    .1920647
+_Dtimesi~l14 |   .1056269    .030446     3.47   0.001      .045944    .1653099
+_Dtimesi~l15 |          0  (omitted)
+_Dtimesi~l16 |          0  (omitted)
+         age |          0  (omitted)
+        age2 |  -.0007652   .0020505    -0.37   0.709    -.0047847    .0032543
+        age3 |   .0000145   .0000316     0.46   0.646    -.0000474    .0000764
+        age4 |  -9.48e-08   1.78e-07    -0.53   0.595    -4.45e-07    2.55e-07
+       _cons |   8.923643   1.419824     6.29   0.000     6.140375    11.70691
+-------------+----------------------------------------------------------------
+     sigma_u |   .3659814
+     sigma_e |  .12450586
+         rho |  .89627085   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0: F(723, 7279) = 34.47                  Prob > F = 0.0000
+    - eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effe
+> ct') name(g`i++') `omitcat' tit(SWH Specification) subtit(Control. for Person
+>  FE; Year Since Event (for Disp and Non-Disp) and Year FE) ytitle(Log Earning
+> s) `opt'
+    = eventstudy_figure, from(-5) to(10) treatment_effect(-0.2) name(g103) omit
+> (-1) tit(SWH Specification) subtit(Control. for Person FE; Year Since Event (
+> for Disp and Non-Disp) and Year FE) ytitle(Log Earnings) ysize(8) xsize(12) x
+> line(-0.5, lcol(gray)) legend(off)
+16
+number of observations will be reset to 15
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 15.
+(0 observations deleted)
+(1 observation created)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(4 real changes made)
+(11 missing values generated)
+(11 real changes made)
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_FE_Full.pdf) eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_FE_Full.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_FE_Full
+Fileend: pdf
+Filename: eventstudy_FE_Full.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_FE_Full.pdf saved as PDF format
+    - xtreg employed _DtimesinceTreat* _Dyear* _DtimesinceAll* `controls', fe i
+> (persid2)
+    = xtreg employed _DtimesinceTreat* _Dyear* _DtimesinceAll* age age2 age3 ag
+> e4, fe i(persid2)
+note: _DtimesinceAll15 omitted because of collinearity.
+note: _DtimesinceAll16 omitted because of collinearity.
+note: age omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =      8,050
+Group variable: persid2                         Number of groups  =        724
+
+R-squared:                                      Obs per group:
+     Within  = 0.2067                                         min =          5
+     Between = 0.0022                                         avg =       11.1
+     Overall = 0.0018                                         max =         16
+
+                                                F(47, 7279)       =      40.34
+corr(u_i, Xb) = -0.9931                         Prob > F          =     0.0000
+
+------------------------------------------------------------------------------
+    employed | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+_Dtimesin~t1 |   -.014996   .0198877    -0.75   0.451    -.0539817    .0239897
+_Dtimesin~t2 |  -.0003855   .0190686    -0.02   0.984    -.0377655    .0369945
+_Dtimesin~t3 |  -.0002119   .0190673    -0.01   0.991    -.0375894    .0371657
+_Dtimesin~t4 |  -.0000857   .0190668    -0.00   0.996    -.0374621    .0372908
+_Dtimesin~t6 |   -.397738   .0190667   -20.86   0.000    -.4351143   -.3603616
+_Dtimesin~t7 |  -.2124665   .0194756   -10.91   0.000    -.2506442   -.1742888
+_Dtimesin~t8 |  -.1888385   .0203202    -9.29   0.000     -.228672    -.149005
+_Dtimesin~t9 |  -.1879749   .0213093    -8.82   0.000    -.2297473   -.1462025
+_Dtimesi~t10 |   -.165842   .0225959    -7.34   0.000    -.2101366   -.1215474
+_Dtimesi~t11 |  -.1671317   .0241613    -6.92   0.000    -.2144947   -.1197686
+_Dtimesi~t12 |  -.1140796   .0247907    -4.60   0.000    -.1626765   -.0654826
+_Dtimesi~t13 |  -.0891169   .0247941    -3.59   0.000    -.1377205   -.0405134
+_Dtimesi~t14 |  -.0979637    .026592    -3.68   0.000    -.1500918   -.0458357
+_Dtimesi~t15 |  -.1147609   .0282822    -4.06   0.000    -.1702022   -.0593195
+_Dtimesi~t16 |   -.085682   .0358065    -2.39   0.017    -.1558731   -.0154909
+     _Dyear2 |   .1764846   .0917565     1.92   0.054    -.0033847    .3563538
+     _Dyear3 |   .3616346   .1797786     2.01   0.044     .0092164    .7140529
+     _Dyear4 |   .5474878   .2689943     2.04   0.042      .020181    1.074795
+     _Dyear5 |   .7209975   .3583351     2.01   0.044     .0185568    1.423438
+     _Dyear6 |   .9147198   .4476349     2.04   0.041     .0372256    1.792214
+     _Dyear7 |   1.119642   .5370675     2.08   0.037     .0668337     2.17245
+     _Dyear8 |   1.316169   .6264696     2.10   0.036     .0881069    2.544231
+     _Dyear9 |   1.515204   .7159548     2.12   0.034     .1117245    2.918683
+    _Dyear10 |   1.700222   .8053115     2.11   0.035     .1215783    3.278866
+    _Dyear11 |   1.884694   .8947723     2.11   0.035     .1306807    3.638707
+    _Dyear12 |   2.067935   .9841913     2.10   0.036     .1386344    3.997235
+    _Dyear13 |   2.268556   1.073637     2.11   0.035     .1639174    4.373195
+    _Dyear14 |   2.449213   1.163291     2.11   0.035     .1688264      4.7296
+    _Dyear15 |    2.64564   1.252428     2.11   0.035     .1905176    5.100763
+    _Dyear16 |   2.818807   1.342148     2.10   0.036     .1878082    5.449806
+_Dtimesin~l1 |   .3488557   .4141372     0.84   0.400    -.4629734    1.160685
+_Dtimesin~l2 |    .325906   .3853569     0.85   0.398    -.4295053    1.081317
+_Dtimesin~l3 |   .3062292   .3565679     0.86   0.390    -.3927472    1.005206
+_Dtimesin~l4 |    .286366   .3277201     0.87   0.382    -.3560605    .9287925
+_Dtimesin~l5 |   .2648719   .2989365     0.89   0.376    -.3211303    .8508741
+_Dtimesin~l6 |    .242325   .2701832     0.90   0.370    -.2873124    .7719624
+_Dtimesin~l7 |   .2097947   .2414152     0.87   0.385    -.2634491    .6830386
+_Dtimesin~l8 |   .1764767   .2127028     0.83   0.407    -.2404824    .5934358
+_Dtimesin~l9 |   .1558284    .184079     0.85   0.397    -.2050197    .5166765
+_Dtimesi~l10 |   .1334179   .1554729     0.86   0.391    -.1713541    .4381899
+_Dtimesi~l11 |   .1111512   .1269151     0.88   0.381    -.1376393    .3599417
+_Dtimesi~l12 |   .0662772   .0987504     0.67   0.502    -.1273023    .2598567
+_Dtimesi~l13 |   .0375583   .0705855     0.53   0.595    -.1008097    .1759262
+_Dtimesi~l14 |   .0090291   .0443546     0.20   0.839    -.0779188     .095977
+_Dtimesi~l15 |          0  (omitted)
+_Dtimesi~l16 |          0  (omitted)
+         age |          0  (omitted)
+        age2 |  -.0059707   .0029872    -2.00   0.046    -.0118265    -.000115
+        age3 |   .0000918    .000046     2.00   0.046     1.61e-06    .0001819
+        age4 |  -5.16e-07   2.60e-07    -1.98   0.047    -1.03e-06   -6.23e-09
+       _cons |   4.602376   2.068442     2.23   0.026     .5476289    8.657123
+-------------+----------------------------------------------------------------
+     sigma_u |  1.5620492
+     sigma_e |  .18138383
+         rho |  .98669573   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0: F(723, 7279) = 7.32                   Prob > F = 0.0000
+    - eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' tit(SWH S
+> pecification) subtit(Outcome: Employment) ytitle(Employed) `opt'
+    = eventstudy_figure, from(-5) to(10) name(g104) omit(-1) tit(SWH Specificat
+> ion) subtit(Outcome: Employment) ytitle(Employed) ysize(8) xsize(12) xline(-0
+> .5, lcol(gray)) legend(off)
+16
+number of observations will be reset to 15
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 15.
+(0 observations deleted)
+(1 observation created)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(4 real changes made)
+    - latexlog `file': addfig, file(Eventstudy/eventstudy_FE_Full_employed.pdf)
+>  eol
+    = latexlog ../log/eventstudy_analysis.tex: addfig, file(Eventstudy/eventstu
+> dy_FE_Full_employed.pdf) eol
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+
+macros:
+           r(filename) : "eventstudy_analysis.tex"
+            r(fileend) : "tex"
+           r(filestub) : "eventstudy_analysis"
+               r(path) : "../log/"
+../log/
+Path: Eventstudy/
+Filestub: eventstudy_FE_Full_employed
+Fileend: pdf
+Filename: eventstudy_FE_Full_employed.pdf
+file
+    /Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/Match
+    > ingEventstudy_CodeExample
+    public/do/../log/Eventstudy/eventstudy_FE_Full_employed.pdf saved as PDF
+    format
+    - latexlog `file': close
+    = latexlog ../log/eventstudy_analysis.tex: close
+    - latexlog `file': pdf, view
+    = latexlog ../log/eventstudy_analysis.tex: pdf, view
+Path: ../log/
+Filestub: eventstudy_analysis
+Fileend: tex
+Filename: eventstudy_analysis.tex
+/Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/MatchingEve
+> ntstudy_CodeExample public/log
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded form
+> at=pdflatex)
+ \write18 enabled.
+ Source specials enabled.
+entering extended mode
+(./eventstudy_analysis.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24>
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/size10.clo))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/lscape.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-def/pdftex.def))))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/rotating.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphicx.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/ifthen.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/threeparttable/threeparttable.sty
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/caption/subcaption.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/caption.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/caption3.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/caption/ltcaption.sty)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/tabularx.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/array.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/graphics-cfg/color.cfg))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/colortbl/colortbl.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/url/url.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/local/texlive/2022/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/usr/local/texlive/2022/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file eventstudy_analysis.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: letterpaper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(71.13188pt, 451.01793pt, 92.14519pt)
+* v-part:(T,H,B)=(71.13188pt, 628.44073pt, 95.39737pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=451.01793pt
+* \textheight=628.44073pt
+* \oddsidemargin=-1.1381pt
+* \evensidemargin=-1.1381pt
+* \topmargin=-38.1381pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2022/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/local/texlive/2022/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty))
+
+LaTeX Warning: No \author given.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 13--19
+
+[1{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./Eve
+ntstudy/eventstudy_RawMeans.pdf>] [2 <./Eventstudy/eventstudy_OLS.pdf> <./Event
+study/eventstudy_FE_JLS.pdf>] [3 <./Eventstudy/eventstudy_FE_RelYear.pdf> <./Ev
+entstudy/eventstudy_FE_Full.pdf>] [4 <./Eventstudy/eventstudy_FE_Full_employed.
+pdf>] (./eventstudy_analysis.aux)
+
+Package rerunfilecheck Warning: File `eventstudy_analysis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/local/texlive/2022/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2022/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
+Output written on eventstudy_analysis.pdf (4 pages, 141660 bytes).
+Transcript written on eventstudy_analysis.log.
+/Users/johannes/Library/CloudStorage/Dropbox-Personal/research/Code/MatchingEve
+> ntstudy_CodeExample public/do
+
+    ----------------------------------------------- end eventstudy_analysis ---
+  - cap log close log
