@@ -8,7 +8,7 @@ Finally the code stacks all the 'sub-experiments' corresponding to each cell. No
 
 The code first simulates data and then estimates the event study on the simulated data. The context for this example is a job displacement analysis, where displaced workers are matched to non-displaced workers, however the same strategy can be used for many other types of analysis.
 
-The code is based on the following paper:
+The code is loosely based on the following paper:
 Schmieder, Johannes F., Till von Wachter, and Jörg Heining. “The Costs of Job Displacement over the Business Cycle and Its Sources: Evidence from Germany.” American Economic Review 113, no. 5 (May 2023): 1208–54. https://doi.org/10.1257/aer.20200252.
 
 

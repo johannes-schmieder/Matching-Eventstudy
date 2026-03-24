@@ -37,12 +37,11 @@ program define main
 	// =====================================
 	// Simulate Yearly Data
 	// =====================================
-	simulate_yearly_data, out(${data}person_year_data.dta)
+	// simulate_yearly_data, out(${data}person_year_data.dta)
 
 	// =====================================
 	// Matching Algorithm to create treatment and control group
 	// =====================================
-
 	generate_treatment_control, ///
 		in(${data}person_year_data.dta) ///
 		out(${data}analysis_data.dta)
@@ -230,7 +229,6 @@ program define simulate_yearly_data
 	label values sep sep1
 
 
-
 	bys persid (time): g leave_labor_force = runiform()<.03 
 	bys persid (time): replace leave_labor_force = leave_labor_force[_n-1] if _n>1 & leave_labor_force==0
 	replace employed = 0 if leave_labor_force==1
@@ -248,10 +246,6 @@ program define simulate_yearly_data
 
 	bys persid (baselinetime) : replace baselinetime = baselinetime[1]
 	g timesince = time-baselinetime-1
-
-	// cellgraph logearn  if inrange(timesince,-5,10), by(timesince)
-	// cellgraph employed if inrange(timesince,-5,10), by(timesince)
-
 
 	rename timesince timesince1
 	rename displaced displaced1
@@ -420,6 +414,8 @@ program define generate_treatment_control
 				drop _weight
 
 				replace matchround = `matchround' if _treated==0 | _treated==1
+				bys persid (matchround): replace matchround = matchround[1] 
+
 				replace psmatchid = _id if _treated==0
 
 				replace psmatchid = _n1 if _treated==1
@@ -463,16 +459,20 @@ program define generate_treatment_control
 	drop psmatchid_temp
 
 
-	label define sep 0 "Non-displaced" 1 "displaced"
+	egen double pers_matchround_id = group(persid matchround)
+	label var pers_matchround_id "Person-Matchround ID"
+
+	label define sep 0 "Non-displaced" 1 "Displaced"
 	label values sep sep
 
+	label var timesince "Years relative to displacement"
+
+	g baseline_earnings = earn if timesince==-1
+	bys pers_matchround_id (baseline_earnings): replace baseline_earnings = baseline_earnings[1]
+    g earnings_growth = (earn - baseline_earnings) / baseline_earnings
+	label var earnings_growth "Earnings Growth (%)"
+
 	save `out' , replace
-
-	cellgraph logearn, by(timesince sep)
-	
-	// 	err
-
-	// err
 
 end // generate_treatment_control
 
@@ -490,7 +490,7 @@ program define descriptive_analysis
 
 	latexlog `file': title "Descriptives for Displacement Analysis Sample"
 
-	latexlog `file': section "Summary Table"
+	latexlog `file': section "Summary Statistics"
 	
 	// ====== Summary Tables using Stata's Table Command ======
 	
@@ -498,37 +498,41 @@ program define descriptive_analysis
 	g N = 1
 	label var N "Number of Observations"
 	// ====== Summary Table ======
-	// Create summary table using Stata's table command
+	latexlog `file': writeln "Start by clearly defininng your sample and summarizing the baseline characteristics."
+	latexlog `file': writeln "Stata's table command is used to create the tables in this section.\\\\"
+	latexlog `file': writeln "Here is a standard summary table, showing sample characteristics in"
+	latexlog `file': writeln "the baseline year (year prior to event, both treatment and control) over time."
 	
-		// table (var) (sep) if timesince==-1, ///
-		// 	statistic(mean `vars') ///
-		// 	statistic(sd `vars') ///
-		// 	statistic(count N) ///
-		// 	nformat(%9.2f) nototals 
-		
-		// collect style header result, level(hide)
-		// collect style cell result[sd], sformat("[%s]")
-		// collect style cell result[count], nformat("%8.0gc")
-		// collect style cell result, halign(center)
-		// collect style cell var[N], border(top)
+	table (var) (year) if timesince==-1 & inlist(year,1993,1999, 2004), ///
+		statistic(mean `vars') ///
+		statistic(sd `vars') ///
+		statistic(count N) ///
+		nformat(%9.2f) nototals 
 	
-		// collect label levels sep 0 "Non-displaced" 1 "Displaced", modify
-		// collect style header sep, title(hide)
-		// // collect style header sep, level(hide)
-		// collect preview
-		// latexlog `file': collect export , ///
-		// 	booktabs novert three  ///
-		// 	title(Summary Statistics by Displacement Status) 
+	collect style header result, level(hide)
+	collect style cell result[sd], sformat("[%s]")
+	collect style cell result[count], nformat("%8.0gc")
+	collect style cell result, halign(center)
+	collect style cell var[N], border(top)
+
+	// collect label levels sep 0 "Non-displaced" 1 "Displaced", modify
+	collect style header year, title(hide)
+	// collect style header sep, level(hide)
+	collect preview
+	latexlog `file': collect export , ///
+		booktabs novert three  ///
+		title(Summary Statistics in Baseline Year over Time) 
 		
 	// ======  Summary Table with overlapping columns ======
+	latexlog `file': writeln "\clearpage"
+	latexlog `file': writeln "Next, we create a summary table with overlapping columns (that is not mutually exclusive), showing"
+	latexlog `file': writeln "the sample characteristics of the all workers as well as the treatment and control groups."
 	
-	collect clear 	
-	
+	collect clear 		
 	foreach column in All  Non_Disp Disp {
 		if "`column'"=="All"      local cond 1
 		if "`column'"=="Non_Disp" local cond sep==0
 		if "`column'"=="Disp"     local cond sep==1
-
 		
 		egen N_estab = tag(estabid) if timesince==-1 & `cond'
 		table (var) if timesince==-1 , ///
@@ -583,12 +587,17 @@ program define descriptive_analysis
 
 
 	// ====== Tables Summarize Variables with Percentiles =====
+	latexlog `file': writeln "\\\\ Next, we create a table summarizing the distribution of the variables of interest."
+	latexlog `file': writeln "We report the 10th, 25th, 50th, 75th, and 90th percentiles, min, max, as well as the mean and standard deviation."
+	latexlog `file': writeln "Looking at details like this can often catch problems with the data cleaning or the data itself."
 	table (var) if timesince==-1, ///
 		statistic(p10 `vars') ///
 		statistic(p25 `vars') ///
 		statistic(p50 `vars') ///
 		statistic(p75 `vars') ///
 		statistic(p90 `vars') ///
+		statistic(min `vars') ///
+		statistic(max `vars') ///
 		statistic(mean `vars') ///
 		statistic(sd `vars') ///
 		statistic(count `vars') ///
@@ -599,6 +608,8 @@ program define descriptive_analysis
 	collect label levels result p50 "50th pct", modify
 	collect label levels result p75 "75th pct", modify
 	collect label levels result p90 "90th pct", modify
+	collect label levels result min "Min", modify
+	collect label levels result max "Max", modify
 	collect label levels result mean "Mean", modify
 	collect label levels result sd "SD", modify
 	collect label levels result count "N", modify
@@ -610,10 +621,13 @@ program define descriptive_analysis
 
 	collect preview
 	latexlog `file': collect export , ///
-		booktabs novert three  ///
+		booktabs novert three fontsize(small) ///
 		title(Summary Statistics with Percentiles) 
 
-	// ====== Table Industry Composition =====
+	// ====== Table Industry Composition =====	
+	latexlog `file': writeln "\\\\ Next, we create a table showing the industry composition of the sample."
+	latexlog `file': writeln "This is a simple table showing the percentage of workers in each industry for the treatment and control groups."
+	latexlog `file': writeln "This should be perfectly balanced by construction but it is a good check to make sure that the matching is working."
 	table (industry) (sep) if timesince==-1, ///
 		statistic(percent, across(industry)) ///
 		nformat(%9.3f) ///
@@ -644,47 +658,75 @@ program define descriptive_analysis
 		notes(Each cell shows number of workers per cell)
 
 	// ====== Flexible Summary Table ======
-	
+	latexlog `file': writeln "\\\\ Next, we create descriptive figures showing the evolution of some key variables by year."
 	
 	latexlog `file': section "Consistency Checks"
 	cap mkdir ${log}Consistency/
 		
-	cellgraph N , by(time) nonotes stat(sum)
-	latexlog `file': addfig, file(Consistency/counts_by_time.pdf) eol
-	
-	cellgraph earn , by(time) nonotes stat(mean)
-	latexlog `file': addfig, file(Consistency/earn_by_time.pdf) eol
-	
-	cellgraph logearn , by(time) nonotes stat(mean)
-	latexlog `file': addfig, file(Consistency/logearn_by_time.pdf) eol
-	
-	cellgraph logearn , by(time) nonotes stat(p10 p25 p50 p75 p90)
-	latexlog `file': addfig, file(Consistency/logearn_by_year_pct.pdf) eol
-	
-	cellgraph employed , by(time) nonotes
-	latexlog `file': addfig, file(Consistency/employed_by_time.pdf) eol
-	
-	cellgraph displaced , by(time) nonotes
-	latexlog `file': addfig, file(Consistency/displaced_by_time.pdf) eol
+	latexlog `file': subfigure, open title("Consistency Checks")
 
+	cellgraph N , by(time) nonotes stat(sum) title(" ")
+	latexlog `file': subfigure, addfig file(Consistency/counts_by_time.pdf) ///
+		caption("Counts by Year") width(0.45)
+
+	cellgraph earn , by(time) nonotes stat(mean) title(" ") legend(off)
+	latexlog `file': subfigure, addfig file(Consistency/earn_by_time.pdf) ///
+		caption("Earnings by Year") width(0.45) eol
+
+	cellgraph logearn , by(time) nonotes stat(mean) title(" ") legend(off)
+	latexlog `file': subfigure, addfig file(Consistency/logearn_by_time.pdf) ///
+		caption("Log Earnings by Year") width(0.45)
+
+	cellgraph logearn , by(time) nonotes stat(p10 p25 p50 p75 p90) title(" ")
+	latexlog `file': subfigure, addfig file(Consistency/logearn_by_year_pct.pdf) ///
+		caption("Log Earnings Percentiles by Year") width(0.45) eol
+
+	cellgraph employed , by(time) nonotes title(" ") legend(off)
+	latexlog `file': subfigure, addfig file(Consistency/employed_by_time.pdf) ///
+		caption("Employment by Year") width(0.45)
+
+	cellgraph displaced , by(time) nonotes title(" ") legend(off)
+	latexlog `file': subfigure, addfig file(Consistency/displaced_by_time.pdf) ///
+		caption("Displaced by Year") width(0.45) eol
+
+	latexlog `file': subfigure, close
 
 	latexlog `file': section "Treatment and Control around Displacement Event"
+
+	latexlog `file': writeln "Now we create a set of figures showing the treatment and control groups around the displacement event."
+	latexlog `file': writeln "\\\\ Given the matching design, this already allows us to get a good sense of the treatment effect."
+	latexlog `file': writeln "\\\\ Looking at the raw means like this is often a much better way to understand "
+	latexlog `file': writeln "what is happening then going straight to the eventstudy."
+
 	cap mkdir ${log}Disp_event_raw/
 
-	cellgraph N , by(timesince sep) nonotes stat(sum)
-	latexlog `file': addfig, file(Disp_event_raw/counts_by_timesince.pdf) eol
+	latexlog `file': subfigure, open title("Treatment and Control around Displacement Event")
 
-	cellgraph earn , by(timesince sep) nonotes
-	latexlog `file': addfig, file(Disp_event_raw/logearn_by_timesince.pdf) eol
+	cellgraph N , by(timesince sep) nonotes stat(sum) legend(pos(7) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/counts_by_timesince.pdf) ///
+		caption("Counts") width(0.45)
 
-	cellgraph logearn , by(timesince sep) nonotes
-	latexlog `file': addfig, file(Disp_event_raw/earn_by_timesince.pdf) eol
+	cellgraph displaced , by(timesince sep) nonotes legend(pos(3) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/displaced_by_timesince.pdf) ///
+		caption("Displacement Status") width(0.45)
 
-	cellgraph employed , by(timesince sep) nonotes
-	latexlog `file': addfig, file(Disp_event_raw/employed_by_timesince.pdf) eol
+	cellgraph earn , by(timesince sep) nonotes legend(pos(7) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/logearn_by_timesince.pdf) ///
+		caption("Earnings") width(0.45) eol
 
-	cellgraph displaced , by(timesince sep) nonotes
-	latexlog `file': addfig, file(Disp_event_raw/displaced_by_timesince.pdf) eol
+	cellgraph earnings_growth , by(timesince sep) nonotes legend(pos(7) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/earnings_growth_by_timesince.pdf) ///
+		caption("Earnings Growth $\frac{y_{i,t} - y_{i,-1}}{y_{i,-1}}$") width(0.45)
+
+	cellgraph logearn , by(timesince sep) nonotes legend(pos(7) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/earn_by_timesince.pdf) ///
+		caption("Log Earnings $\log (y_{i,t} | y_{i,t}\geq 0)$") width(0.45)
+
+	cellgraph employed , by(timesince sep) nonotes legend(pos(7) ring(0) col(1)) title(" ")
+	latexlog `file': subfigure, addfig file(Disp_event_raw/employed_by_timesince.pdf) ///
+		caption("Employment") width(0.45) eol
+
+	latexlog `file': subfigure, close
 
 
 	latexlog `file': close
@@ -699,13 +741,13 @@ end // descriptive_analysis
 cap program drop eventstudy_analysis
 program define eventstudy_analysis
 	syntax , [ ///
-	in(str)                   /// Person / year data
-	from(int -5)  ///  Range of Eventstudy
-	to(int 10)   ///
+		in(str)                   /// Person / year data
+		from(int -5)  ///  Range of Eventstudy
+		to(int 10)   ///
 		omit(int -1) /// Omitted category
 	]
 
-	use `in' if timesince>=`from', clear
+	use `in' if timesince>=`from' & timesince<=`to', clear
 
 	egen persid2 = group(baselinetime persid)
 
@@ -714,7 +756,7 @@ program define eventstudy_analysis
 
 	qui tab timesince, gen(_DtimesinceTreat)
 
-	// The following is not obvious, but otherwise the values are missing for ctrl group
+	// set all treatment time dummies to 0 for control group
 	foreach v of varlist _Dtime* {
 		replace `v' = 0 if sep==0
 	}
@@ -741,49 +783,195 @@ program define eventstudy_analysis
 
 	latexlog `file': title "Eventstudy Analysis for Displacement Events"
 
-	cellgraph logearn, by(timesince sep) title(Raw Means for Disp and Non-Disp Workers)
-	latexlog `file': addfig, file(Eventstudy/eventstudy_RawMeans.pdf) eol
+	latexlog `file': section "Comparing Eventstudy Specifications"
+	latexlog `file': writeln "Next, we compare the eventstudy estimates across different specifications."
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Raw Means (always good to compare to the eventstudy estimates)"
+	latexlog `file': writeln "\item OLS - Rel. year effects, no person FE"
+	latexlog `file': writeln "\item JLS Specification: Cal. year and person FE - since we are not cotrolling for relative year effects, the estimates are not consistent"
+	latexlog `file': writeln "\item Rel. year effects, person FE"
+	latexlog `file': writeln "\item Relative year, calendar year and person FE"
+	latexlog `file': writeln "\item Controlling for fully interacted calendar and relative year effects, as well as person FE"
+	latexlog `file': writeln "\end{itemize}"
+	latexlog `file': writeln "\\\\ The matching design does the heavy lifting, that's why these specification yield very similar results."
 
-	local opt ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off)
+	local opt ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off) yscale(range(-.3 .1)) ylabel(-.3(.1).1)
+
+	latexlog `file': subfigure, open title("Comparing Eventstudy Specifications")
+
+	cellgraph logearn, by(timesince sep) title(" ") legend(pos(7) ring(0) col(1))
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_RawMeans.pdf) ///
+		caption("Raw Means") width(0.45)
 
 	reg logearn _DtimesinceTreat* _DtimesinceAll* `controls',
 	eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effect') name(g`i++') `omitcat' ///
-		tit(OLS - Rel. Year Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp)) ///
+		/// tit(OLS - Rel. Year Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp)) ///
 		ytitle(Log Earnings) ///
 		`opt'
-	latexlog `file': addfig, file(Eventstudy/eventstudy_OLS.pdf) eol
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_OLS.pdf) ///
+		caption("Rel. year effects, no person FE") width(0.45) eol
 
 	// --- JLS Specification - DOES NOT WORK ---
 	xtreg logearn _DtimesinceTreat* _Dyear* `controls', fe i(persid2)
 	eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effect') name(g`i++') `omitcat' ///
-		tit(JLS Specification) subtit(Controlling for Year and Person FE) ///
+		/// tit(JLS Specification) subtit(Controlling for Year and Person FE) ///
 		ytitle(Log Earnings) ///
 		`opt'
-	latexlog `file': addfig, file(Eventstudy/eventstudy_FE_JLS.pdf) eol
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_FE_JLS.pdf) ///
+		caption("Cal. year and person FE - does not work!") width(0.45)
 
 	// --- Rel Year Specification ---
 	xtreg logearn _DtimesinceTreat* _DtimesinceAll* `controls',  fe i(persid2)
 	eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effect') name(g`i++') `omitcat' ///
-		tit(Rel. Year Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp)) ///
+		///tit(Rel. Year Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp)) ///
 		ytitle(Log Earnings) ///
 		`opt'
-	latexlog `file': addfig, file(Eventstudy/eventstudy_FE_RelYear.pdf) eol
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_FE_RelYear.pdf) ///
+		caption("Rel. year effects, person FE") width(0.45) eol
 
 	// --- Schmieder / von Wachter / Heining Specification ---
 	xtreg logearn _DtimesinceTreat* _Dyear* _DtimesinceAll* `controls', fe i(persid2)
 	eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effect') name(g`i++') `omitcat' ///
-		tit(SWH Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp) and Year FE) ///
+		/// tit(SWH Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp) and Year FE) ///
 		ytitle(Log Earnings) ///
 		`opt'
-	latexlog `file': addfig, file(Eventstudy/eventstudy_FE_Full.pdf) eol
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_FE_Full.pdf) ///
+		caption("Rel. year, cal. year and person FE") width(0.45)
 
 	// --- Schmieder / von Wachter / Heining Specification ---
-	xtreg employed _DtimesinceTreat* _Dyear* _DtimesinceAll* `controls', fe i(persid2)
-	eventstudy_figure, from(`from') to(`to')  name(g`i++') `omitcat' ///
-		tit(SWH Specification) subtit(Outcome: Employment) ///
-		ytitle(Employed) ///
+	reghdfe logearn _DtimesinceTreat* `controls', absorb(persid2 timesince#year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') treatment_effect(`treatment_effect') name(g`i++') `omitcat' ///
+		/// tit(SWH Specification) subtit(Control. for Person FE; Year Since Event (for Disp and Non-Disp) and Year FE) ///
+		ytitle(Log Earnings) ///
 		`opt'
-	latexlog `file': addfig, file(Eventstudy/eventstudy_FE_Full_employed.pdf) eol
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_FE_Full.pdf) ///
+		caption("Rel. year $\times$ cal. year and person FE") width(0.45)
+
+	latexlog `file': subfigure, close
+
+	latexlog `file': writeln "\clearpage \newpage"
+	latexlog `file': section "Different Outcomes"
+	latexlog `file': writeln "Next, we create eventstudy estimates for different outcomes."
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Earnings in Levels"
+	latexlog `file': writeln "\item Earnings Growth"
+	latexlog `file': writeln "\item Log Earnings conditional on positive earnings"
+	latexlog `file': writeln "\item Employment"
+	latexlog `file': writeln "\end{itemize}"
+
+	local opt2 ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off)
+
+	latexlog `file': subfigure, open title("Event Study Estimates for Different Outcomes")
+
+	// --- Earnings in Levels ---
+	reghdfe earn _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to')  name(g`i++') `omitcat' ///
+		ytitle(Earnings) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_earn.pdf) ///
+		caption("Earnings in Levels") width(0.45)
+
+	// --- Employment ---
+	reghdfe employed _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' ///
+		ytitle(Employed) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_employed.pdf) ///
+		caption("Employment") width(0.45) eol
+
+	
+	// --- Log Earnings ---
+	reghdfe logearn _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to')  name(g`i++') `omitcat' ///
+		ytitle(Log Earnings) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_logearn.pdf) ///
+		caption("Log Earnings cond. on pos. Earnings") width(0.45)
+
+	// --- Earnings Growth ---
+	reghdfe earnings_growth _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' ///
+		ytitle(Earnings Growth) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_earnings_growth.pdf) ///
+		caption("Earnings Growth") width(0.45) eol
+
+	latexlog `file': subfigure, close
+
+
+
+	latexlog `file': writeln "\clearpage \newpage"
+	latexlog `file': section "Different Outcomes"
+	latexlog `file': writeln "Next, we create eventstudy estimates for different outcomes."
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Scale Raw Mean Difference by Control Mean: "
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Outcome: $\frac{\bar{y}_{t}^{D} - \bar{y}_{t}^{ND}}{\bar{y}_{t}^{ND}}$"
+	latexlog `file': writeln "\end{itemize}"
+	latexlog `file': writeln "\item Scale Regression Coefficient from level regression by Control Mean: "
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Outcome: $ y_{it}$"
+	latexlog `file': writeln "\item Regression: $ y_{it} = \alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k + \varepsilon_{it}$"
+	latexlog `file': writeln "\item Scale: $\frac{\hat{\beta}_t}{E[y_{it}|X_{it},Non-Displaced]}$"
+	latexlog `file': writeln "\end{itemize}"
+	latexlog `file': writeln "\item Earnings Growth in percent: "
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Outcome: $ \Delta y_{i,t} = \frac{y_{i,t} - y_{i,-1}}{y_{i,-1}}$"
+	latexlog `file': writeln "\item Regression: $ \Delta y_{i,t} = \alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k + \varepsilon_{it}$"
+	latexlog `file': writeln "\item Scale: $\beta_t$"
+	latexlog `file': writeln "\end{itemize}"
+	latexlog `file': writeln "\item Poisson QMLE: "
+	latexlog `file': writeln "\begin{itemize}"
+	latexlog `file': writeln "\item Outcome: $y_{it}$"
+	latexlog `file': writeln "\item Regression model: $ E[y_{it}|X_{it}] = \exp(\alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k), $"
+	latexlog `file': writeln "\item Scale: $\exp(\hat{\beta}_t) - 1$"
+	latexlog `file': writeln "\end{itemize}"
+
+	latexlog `file': subfigure, open title("Expressing Earnings Losses in Percent (incl. zero earnings)")
+
+	// --- Difference in means between treatment and control scaled by control mean---
+	reghdfe earn _DtimesinceTreat* , absorb( timesince ) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' pctcontrol(earn) ///
+		ytitle(Earnings Loss (% of control)) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_mean_diff.pdf) ///
+		caption("Scale Raw Mean Difference: $\frac{\bar{y}_{t}^{D} - \bar{y}_{t}^{ND}}{\bar{y}_{t}^{ND}}$") width(0.45)
+
+	// --- Percent relative to control ---
+	reghdfe earn _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' pctcontrol(earn) ///
+		ytitle(Earnings Loss (% of control)) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_pct_control.pdf) ///
+		caption("Scale Regression Coefficient: $\frac{\hat{\beta}_t}{\bar{y}_{t}^{ND}}$") width(0.45)
+
+	// --- Earnings Growth ---
+	reghdfe earnings_growth _DtimesinceTreat* `controls', absorb(persid2 timesince year) cluster(persid2)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' ///
+		ytitle(Earnings Growth) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_earnings_growth.pdf) ///
+		caption("Earnings Growth: $\frac{y_{i,t} - y_{i,-1}}{y_{i,-1}}$") width(0.45) eol
+
+	// // --- Poisson QMLE ---
+	// ppmlhdfe earn _DtimesinceTreat*  `controls', vce(cluster persid2) absorb(persid2 timesince year)
+	// eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat'  ///
+	// 	ytitle(Log E[Earnings]) ///
+	// 	`opt2'
+	// latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_poisson.pdf) ///
+	// 	caption("Poisson QMLE") width(0.45)
+
+    // --- Poisson QMLE rescaled to percent effect ---
+	ppmlhdfe earn _DtimesinceTreat*  `controls', vce(cluster persid2) absorb(persid2 timesince year)
+	eventstudy_figure, from(`from') to(`to') name(g`i++') `omitcat' pct ///
+		ytitle(Earnings Loss in percent) ///
+		`opt2'
+	latexlog `file': subfigure, addfig file(Eventstudy/eventstudy_poisson_pct.pdf) ///
+		caption("Poisson QMLE, scaled to \%: $\exp(\hat{\beta}_t) - 1$") width(0.45) eol
+
+
+
+	latexlog `file': subfigure, close
 
 	latexlog `file': close
 	latexlog `file': pdf, view
@@ -800,12 +988,23 @@ program define eventstudy_figure
 		to(integer)   ///
 		[ ///
 		OMITcat(str) ///
-		treatment_effect(str)  ]
+		treatment_effect(str) ///
+		PCT ///
+		pctcontrol(str) ]
 
 
 	if "`omitcat'"=="" local omitcat = `from'
 
 	preserve
+
+	// Compute control group means by timesince for pctcontrol rescaling
+	if "`pctcontrol'" != "" {
+		collapse (mean) _control_mean = `pctcontrol' if sep == 0, by(timesince)
+		tempfile control_means
+		save `control_means'
+		restore
+		preserve
+	}
 
 	local totperiods = `to'-(`from') + 1
 
@@ -840,6 +1039,22 @@ program define eventstudy_figure
 	rename coef2 cov_ev
 	gen ci_hi = coef_ev + 2*sqrt(cov_ev)
 	gen ci_lo = coef_ev - 2*sqrt(cov_ev)
+
+	// Rescale to exp(beta)-1 if pct option is specified
+	if "`pct'" != "" {
+		replace coef_ev = exp(coef_ev) - 1
+		replace ci_hi = exp(ci_hi) - 1
+		replace ci_lo = exp(ci_lo) - 1
+	}
+
+	// Rescale as percent of control group mean
+	if "`pctcontrol'" != "" {
+		merge 1:1 timesince using `control_means', nogen
+		replace coef_ev = coef_ev / _control_mean
+		replace ci_hi = ci_hi / _control_mean
+		replace ci_lo = ci_lo / _control_mean
+		drop _control_mean
+	}
 
 	sort timesince
 

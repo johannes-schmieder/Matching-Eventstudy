@@ -1,7 +1,8 @@
-%  17 Apr 2025 11:39:15
+%  23 Mar 2026 17:03:42
 \documentclass{article}
-\usepackage{geometry,booktabs,longtable,pdflscape,rotating,threeparttable,subcaption,graphicx,float,}
-\usepackage{tabularx,xcolor,colortbl,}
+\usepackage{geometry,booktabs,longtable,pdflscape,rotating,threeparttable,subcaption,graphicx,float}
+\usepackage{tabularx,colortbl}
+\usepackage[table]{xcolor}
 \usepackage{hyperref}
 \hypersetup{                           colorlinks=true,                   linkcolor={blue!50!black},                    filecolor={blue!50!black},                 urlcolor={blue!80!black},                     }                              \date{}
 \geometry{verbose,letterpaper,lmargin=2.5cm,tmargin=2.5cm}
@@ -10,11 +11,119 @@
 
 \title{Eventstudy Analysis for Displacement Events}
 \maketitle
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_RawMeans.pdf} \\ 
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_OLS.pdf} \\ 
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_FE_JLS.pdf} \\ 
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_FE_RelYear.pdf} \\ 
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_FE_Full.pdf} \\ 
-\includegraphics[width = .9\textwidth]{Eventstudy/eventstudy_FE_Full_employed.pdf} \\ 
+\section{Comparing Eventstudy Specifications}
+Next, we compare the eventstudy estimates across different specifications.
+\begin{itemize}
+\item Raw Means (always good to compare to the eventstudy estimates)
+\item OLS - Rel. year effects, no person FE
+\item JLS Specification: Cal. year and person FE - since we are not cotrolling for relative year effects, the estimates are not consistent
+\item Rel. year effects, person FE
+\item Relative year, calendar year and person FE
+\item Controlling for fully interacted calendar and relative year effects, as well as person FE
+\end{itemize}
+\\ The matching design does the heavy lifting, that's why these specification yield very similar results.
+\begin{figure}[H] 
+\centering 
+  \caption{Comparing Eventstudy Specifications} 
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_RawMeans.pdf}  
+  \caption{Raw Means}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_OLS.pdf}  
+  \caption{Rel. year effects, no person FE}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_FE_JLS.pdf}  
+  \caption{Cal. year and person FE - does not work!}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_FE_RelYear.pdf}  
+  \caption{Rel. year effects, person FE}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_FE_Full.pdf}  
+  \caption{Rel. year, cal. year and person FE}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_FE_Full.pdf}  
+  \caption{Rel. year $\times$ cal. year and person FE}
+\end{subfigure}
+\end{figure} 
+\clearpage \newpage
+\section{Different Outcomes}
+Next, we create eventstudy estimates for different outcomes.
+\begin{itemize}
+\item Earnings in Levels
+\item Earnings Growth
+\item Log Earnings conditional on positive earnings
+\item Employment
+\end{itemize}
+\begin{figure}[H] 
+\centering 
+  \caption{Event Study Estimates for Different Outcomes} 
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_earn.pdf}  
+  \caption{Earnings in Levels}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_employed.pdf}  
+  \caption{Employment}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_logearn.pdf}  
+  \caption{Log Earnings cond. on pos. earnings}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_earnings_growth.pdf}  
+  \caption{Earnings Growth}
+\end{subfigure}
+\end{figure} 
+\clearpage \newpage
+\section{Different Outcomes}
+Next, we create eventstudy estimates for different outcomes.
+\begin{itemize}
+\item Scale Raw Mean Difference by Control Mean: 
+\begin{itemize}
+\item Outcome: $\frac{\bar{y}_{t}^{D} - \bar{y}_{t}^{ND}}{\bar{y}_{t}^{ND}}$
+\end{itemize}
+\item Scale Regression Coefficient from level regression by Control Mean: 
+\begin{itemize}
+\item Outcome: $ y_{it}$
+\item Regression: $ y_{it} = \alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k + \varepsilon_{it}$
+\item Scale: $\frac{\hat{\beta}_t}{E[y_{it}|X_{it},Non-Displaced]}$
+\end{itemize}
+\item Earnings Growth in percent: 
+\begin{itemize}
+\item Outcome: $ \Delta y_{i,t} = \frac{y_{i,t} - y_{i,-1}}{y_{i,-1}}$
+\item Regression: $ \Delta y_{i,t} = \alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k + \varepsilon_{it}$
+\item Scale: $\beta_t$
+\end{itemize}
+\item Poisson QMLE: 
+\begin{itemize}
+\item Outcome: {it}$
+\item Regression model: $ E[y_{it}|X_{it}] = \exp(\alpha_i + \gamma_t + \sum_k \beta_k D_{it}^k), $
+\item Scale: $\exp(\hat{\beta}_t) - 1$
+\end{itemize}
+\begin{figure}[H] 
+\centering 
+  \caption{Expressing Earnings Losses in Percent (incl. zero earnings)} 
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_mean_diff.pdf}  
+  \caption{Scale Raw Mean Difference: $\frac{\bar{y}_{t}^{D} - \bar{y}_{t}^{ND}}{\bar{y}_{t}^{ND}}$}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_pct_control.pdf}  
+  \caption{Scale Regression Coefficient: $\frac{\hat{\beta}_t}{\bar{y}_{t}^{ND}}$}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_earnings_growth.pdf}  
+  \caption{Earnings Growth: $\frac{y_{i,t} - y_{i,-1}}{y_{i,-1}}$}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \includegraphics[width = 1.00\textwidth]{Eventstudy/eventstudy_poisson_pct.pdf}  
+  \caption{Poisson QMLE, scaled to \%: $\exp(\hat{\beta}_t) - 1$}
+\end{subfigure}
+\end{figure} 
 
 \end{document}
