@@ -1,0 +1,5 @@
+*.log
+*.dta
+log/Consistency/
+log/Disp_event_raw/
+log/Eventstudy/
