@@ -1,4 +1,4 @@
-%  25 Mar 2026 15:03:52
+%  25 Mar 2026 17:06:47
 \documentclass{article}
 \usepackage{geometry,booktabs,longtable,pdflscape,rotating,threeparttable,subcaption,graphicx,float}
 \usepackage{tabularx,colortbl}
@@ -22,6 +22,7 @@ Next, we compare the eventstudy estimates across different specifications.
 \item Controlling for fully interacted calendar and relative year effects, as well as person FE
 \end{itemize}
 \\ The matching design does the heavy lifting, that's why these specification yield very similar results.
+Standard errors are clustered at the matched pair level (Abadie and Spiess, 2022).
 \begin{figure}[H] 
 \centering 
   \caption{Comparing Eventstudy Specifications} 
@@ -439,14 +440,19 @@ remains well-defined, as does Poisson QMLE.
 \end{figure} 
 \textbf{Notes:} Conditional on spouse being \textit{not} employed at baseline.
 Panels (a)--(d) are in levels and well-defined.
-Panels (e)--(g) use hollow circles at the omitted category because scaling by the
-control group mean or Poisson coefficients are unstable when baseline spouse earnings are zero.
+Panels (e)--(g) use hollow circles at the omitted category. Scaled outcomes are undefined (division by zero)
+and Poisson coefficients are not identified for groups where outcomes are precise zeros.
 Panels (h)--(i) normalize by the displaced worker's (positive) baseline earnings or total
 household income and are well-defined even for baseline non-employed spouses.
 Panels (j)--(l) illustrate the sensitivity of $ \log(y + c)$ to the choice of $ c$
 (Chen and Roth, \textit{QJE}, 2024).
 \clearpage \newpage
 \begin{thebibliography}{99}
+
+\bibitem{AbadieSpiess2022}
+Abadie, Alberto and Jann Spiess (2022).
+\textit{Robust Post-Matching Inference.}
+Journal of the American Statistical Association, 117, 983--995.
 
 \bibitem{ChenRoth2024}
 Chen, Jiafeng and Jonathan Roth (2024).

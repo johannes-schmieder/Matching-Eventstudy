@@ -964,6 +964,7 @@ program define eventstudy_analysis
 	latexlog `file': writeln "\item Controlling for fully interacted calendar and relative year effects, as well as person FE"
 	latexlog `file': writeln "\end{itemize}"
 	latexlog `file': writeln "\\\\ The matching design does the heavy lifting, that's why these specification yield very similar results."
+    latexlog `file': writeln "Standard errors are clustered at the matched pair level (Abadie and Spiess, 2022)."
 
 	local opt ysize(8) xsize(12) xline(-0.5, lcol(gray)) legend(off) yscale(range(-.3 .1)) ylabel(-.3(.1).1) scale(1.2)
 
@@ -1601,8 +1602,8 @@ program define eventstudy_analysis
 
 	latexlog `file': writeln "\textbf{Notes:} Conditional on spouse being \textit{not} employed at baseline."
 	latexlog `file': writeln "Panels (a)--(d) are in levels and well-defined."
-	latexlog `file': writeln "Panels (e)--(g) use hollow circles at the omitted category because scaling by the"
-	latexlog `file': writeln "control group mean or Poisson coefficients are unstable when baseline spouse earnings are zero."
+	latexlog `file': writeln "Panels (e)--(g) use hollow circles at the omitted category. Scaled outcomes are undefined (division by zero)"
+	latexlog `file': writeln "and Poisson coefficients are not identified for groups where outcomes are precise zeros."
 	latexlog `file': writeln "Panels (h)--(i) normalize by the displaced worker's (positive) baseline earnings or total"
 	latexlog `file': writeln "household income and are well-defined even for baseline non-employed spouses."
 	latexlog `file': writeln "Panels (j)--(l) illustrate the sensitivity of $ \log(y + c)$ to the choice of $ c$"
@@ -1610,6 +1611,11 @@ program define eventstudy_analysis
 
 	latexlog `file': writeln "\clearpage \newpage"
 	latexlog `file': writeln "\begin{thebibliography}{99}"
+	latexlog `file': writeln ""
+	latexlog `file': writeln "\bibitem{AbadieSpiess2022}"
+	latexlog `file': writeln "Abadie, Alberto and Jann Spiess (2022)."
+	latexlog `file': writeln "\textit{Robust Post-Matching Inference.}"
+	latexlog `file': writeln "Journal of the American Statistical Association, 117, 983--995."
 	latexlog `file': writeln ""
 	latexlog `file': writeln "\bibitem{ChenRoth2024}"
 	latexlog `file': writeln "Chen, Jiafeng and Jonathan Roth (2024)."
