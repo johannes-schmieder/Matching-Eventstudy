@@ -204,6 +204,11 @@ latexlog `file': writeln "\end{tabular}"
 latexlog `file': writeln "\end{table}"
 ```
 
+### LaTeX Gotchas
+
+- **Dollar signs in math**: Stata interprets `$` followed immediately by a letter as a global macro. Add a space after `$` in LaTeX math: `$ x$` not `$x$`. For example: `"$ \\beta_1 $"` instead of `"$\\beta_1$"`.
+- **Line breaks in tables**: Use four backslashes `\\\\` to produce a LaTeX line break `\\`. Stata consumes one level of escaping, so `\\\\` → `\\` in the output.
+
 ### Preamble Options
 
 ```stata
